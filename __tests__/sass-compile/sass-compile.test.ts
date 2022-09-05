@@ -2,7 +2,7 @@
 
 import path from 'path';
 import assert from 'assert';
-import { sassCompile } from '../../src/sass-compile';
+import { sassCompile } from '../../src/compile';
 import { logger } from '../../src/utils';
 
 const FIXTURES_PATH = path.resolve( __dirname, '../__fixtures__' );

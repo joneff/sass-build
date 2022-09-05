@@ -9,7 +9,7 @@ import {
     fileExists,
     requireUserFile
 } from './utils';
-import { sassBuild, sassBuildFiles } from './sass-build';
+import { sassBuild, sassBuildFiles } from './build';
 
 function extendConfig(source: ConfigOptions) : ConfigOptions {
     let baseConfigs = source.extends;
