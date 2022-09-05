@@ -3,7 +3,7 @@
 import fs from 'fs';
 import path from 'path';
 import assert from 'assert';
-import { sassBuild } from '../../src/sass-build';
+import { sassBuild } from '../../src/build';
 import { logger, fileExists } from '../../src/utils';
 
 const FIXTURES_PATH = path.resolve( __dirname, '../__fixtures__' );

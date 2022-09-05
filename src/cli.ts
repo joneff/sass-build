@@ -4,8 +4,8 @@ import {
     exit,
     logger
 } from './utils';
-import { sassBuild, sassBuildFiles, sassBuildString } from './sass-build';
-import { sassCompile } from './sass-compile';
+import { sassBuild, sassBuildFiles, sassBuildString } from './build';
+import { sassCompile } from './compile';
 import { migrateCompilerConfig } from './config-migrate';
 import { buildConfig } from './config-build';
 
@@ -149,7 +149,7 @@ function cli_build(params) {
         if (Array.isArray(file)) {
             logger.silly('cli', '  File is array.');
             logger.silly('cli', '  Attempting to build...');
-            sassBuildFiles( file, <OutputOptions> { path: outDir } );
+            sassBuildFiles( <string[]> file, <OutputOptions> { path: outDir } );
             return;
         }
 
@@ -169,7 +169,7 @@ function cli_build(params) {
         if (Array.isArray(glob)) {
             logger.silly('cli', '  Glob is array.');
             logger.silly('cli', '  Attempting to build...');
-            sassBuildFiles( glob, <OutputOptions> { path: outDir } );
+            sassBuildFiles( <string[]> glob, <OutputOptions> { path: outDir } );
             return;
         }
 
