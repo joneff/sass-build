@@ -1,4 +1,4 @@
-import { wrapImplementation } from './sass-compiler';
+import { wrapImplementation } from './compiler';
 
 function sassBuild( file: string, outFile: string, options?: CliOptions ) : void {
     const compiler = wrapImplementation( options );
