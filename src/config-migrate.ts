@@ -1,5 +1,8 @@
 import {
+    exit,
+    logger,
     requireUserFile,
+    fileExists,
     writeFile
 } from './utils';
 
@@ -15,9 +18,16 @@ type CompilerConfigFileEntry = {
     }
 }
 
-export function migrateCompilerConfig(compilerConfigPath : string, sassConfigPath : string) {
+export function migrateCompilerConfig(src : string, dest : string) {
 
-    const compilerConfigContent : CompilerConfigFileEntry[] = requireUserFile(compilerConfigPath);
+    if (!fileExists(src)) {
+        exit(2, 'error', 'migrate', `Cannot find file ${src}`);
+    }
+
+    logger.silly('migrate', 'Found %s.', src);
+    logger.silly('migrate', '  Migrating...');
+
+    const compilerConfigContent : CompilerConfigFileEntry[] = requireUserFile(src);
     let sassConfigContent : any = {
         extends: [
             'sass-build:recommended'
@@ -42,6 +52,8 @@ export function migrateCompilerConfig(compilerConfigPath : string, sassConfigPat
         return space + word.replaceAll('"', '');
     });
 
-    writeFile( sassConfigPath, sassConfigContent );
+    writeFile( dest, sassConfigContent );
+
+    logger.info('migrate', 'Successfully migrated %s to %s', src, dest );
 
 }
