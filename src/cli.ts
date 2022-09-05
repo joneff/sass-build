@@ -6,7 +6,7 @@ import {
 } from './utils';
 import { sassBuild, sassBuildFiles, sassBuildString } from './build';
 import { sassCompile } from './compile';
-import { migrateCompilerConfig } from './config-migrate';
+import { migrate } from './migrate';
 import { buildConfig } from './config-build';
 
 const commandMap = {
@@ -231,12 +231,12 @@ function cli_compile(params) {
 
 // eslint-disable-next-line camelcase
 function cli_migrate(params) {
-    const { file, outFile } = params;
+    const { file, outFile, transformer } = params;
 
     const src = file || COMPILER_CONFIG;
     const dest = outFile || SASS_CONFIG;
 
-    migrateCompilerConfig( src, dest );
+    migrate( src, dest, transformer );
 }
 
 
