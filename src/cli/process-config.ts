@@ -3,13 +3,14 @@ import _ from 'lodash';
 
 import {
     exit,
+    logger,
     isString,
     isArray,
     objectType,
     fileExists,
     requireUserFile
-} from './utils';
-import { sassBuild, sassBuildFiles } from './build';
+} from '../utils';
+import { sassBuild, sassBuildFiles } from '../build';
 
 function extendConfig(source: ConfigOptions) : ConfigOptions {
     let baseConfigs = source.extends;
@@ -42,7 +43,7 @@ function extendConfig(source: ConfigOptions) : ConfigOptions {
         if (provider === 'plugin') {
             configPath = identifier;
         } else {
-            configPath = path.resolve(__dirname, '../lib', `sass-build-${identifier}.js`);
+            configPath = path.resolve(__dirname, '../../lib', `sass-build-${identifier}.js`);
         }
 
         if (configPath !== '') {
@@ -59,10 +60,18 @@ function extendConfig(source: ConfigOptions) : ConfigOptions {
 }
 
 
-export function buildConfig( configPath: string ) {
+export function processConfig( configPath: string ) {
 
-    if (fileExists(configPath) === false ) {
-        exit( 2, 'error', 'config', `Cannot file config file: configPath` );
+    if (configPath) {
+        logger.silly('cli > process config', `Using config: ${configPath}`);
+    } else {
+        logger.silly('cli > process config', 'Using default config: sass.config.js');
+        // eslint-disable-next-line no-param-reassign
+        configPath = 'sass.config.js';
+    }
+
+    if (!fileExists(configPath)) {
+        exit( 2, 'error', 'cli > process config', `Cannot file config file: ${configPath}` );
     }
 
     let configData : ConfigOptions = requireUserFile( configPath );
