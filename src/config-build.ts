@@ -6,6 +6,7 @@ import {
     isString,
     isArray,
     objectType,
+    fileExists,
     requireUserFile
 } from './utils';
 import { sassBuild, sassBuildFiles } from './sass-build';
@@ -59,6 +60,10 @@ function extendConfig(source: ConfigOptions) : ConfigOptions {
 
 
 export function buildConfig( configPath: string ) {
+
+    if (fileExists(configPath) === false ) {
+        exit( 2, 'error', 'config', `Cannot file config file: configPath` );
+    }
 
     let configData : ConfigOptions = requireUserFile( configPath );
     configData = extendConfig( configData );
