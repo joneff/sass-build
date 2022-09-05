@@ -1,12 +1,11 @@
+import fs from 'fs';
+
 import {
     exit,
-    logger,
-    requireUserFile,
-    fileExists,
-    writeFile
-} from './utils';
+    fileExists
+} from '../utils';
 
-type CompilerConfigFileEntry = {
+type CompilerConfigEntry = {
     inputFile: string;
     outputFile: string;
     minify: {
@@ -18,16 +17,13 @@ type CompilerConfigFileEntry = {
     }
 }
 
-export function migrateCompilerConfig(src : string, dest : string) {
-
-    if (!fileExists(src)) {
-        exit(2, 'error', 'migrate', `Cannot find file ${src}`);
+export function compilerConfigTransformer(pathToConfig: string) {
+    if (!fileExists(pathToConfig)) {
+        exit(2, 'error', 'migrate > transformer', `Cannot find file ${pathToConfig}`);
     }
 
-    logger.silly('migrate', 'Found %s.', src);
-    logger.silly('migrate', '  Migrating...');
+    const compilerConfigJson : CompilerConfigEntry[] = JSON.parse(fs.readFileSync( pathToConfig, 'utf-8' ));
 
-    const compilerConfigContent : CompilerConfigFileEntry[] = requireUserFile(src);
     let sassConfigContent : any = {
         extends: [
             'sass-build:recommended'
@@ -35,7 +31,7 @@ export function migrateCompilerConfig(src : string, dest : string) {
         files: []
     };
 
-    compilerConfigContent.forEach(oldEntry => {
+    compilerConfigJson.forEach(oldEntry => {
         const newEntry = {
             file: oldEntry.inputFile,
             outFile: oldEntry.outputFile,
@@ -52,8 +48,5 @@ export function migrateCompilerConfig(src : string, dest : string) {
         return space + word.replaceAll('"', '');
     });
 
-    writeFile( dest, sassConfigContent );
-
-    logger.info('migrate', 'Successfully migrated %s to %s', src, dest );
-
+    return sassConfigContent;
 }
