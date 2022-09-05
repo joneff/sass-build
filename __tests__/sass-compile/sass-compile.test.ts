@@ -1,4 +1,4 @@
-/// <reference path="../../lib/types/index.d.ts" />
+/// <reference path="../../types/index.d.ts" />
 
 import path from 'path';
 import assert from 'assert';

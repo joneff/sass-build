@@ -1,4 +1,4 @@
-/// <reference path="../lib/types/index.d.ts" />
+/// <reference path="../types/index.d.ts" />
 
 export { sassBuild, sassBuildFiles, sassBuildString } from './sass-build';
 export { sassCompile, sassCompileString } from './sass-compile';
