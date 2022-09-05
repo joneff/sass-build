@@ -1,4 +1,4 @@
-/// <reference path="../../lib/types/index.d.ts" />
+/// <reference path="../../types/index.d.ts" />
 
 import fs from 'fs';
 import path from 'path';
