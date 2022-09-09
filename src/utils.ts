@@ -135,7 +135,7 @@ export function getPostcss( options?: false | 'auto' | [] | PostcssProcessor ) :
 
 
 // #region sass compiler
-function getDefaultSassCompiler() : SassImplementation {
+function getDefaultSassCompiler() : NativeSassCompiler {
     let sassPkg = 'node-sass';
 
     try {
@@ -155,11 +155,11 @@ function getDefaultSassCompiler() : SassImplementation {
     }
 
     // eslint-disable-next-line @typescript-eslint/no-var-requires
-    return <SassImplementation>require(sassPkg);
+    return <NativeSassCompiler>require(sassPkg);
 }
 
-export function getSassCompiler(compiler?: string | SassImplementation) : SassImplementation {
-    let resolvedCompiler = <SassImplementation>compiler;
+export function getSassCompiler(compiler?: string | NativeSassCompiler) : NativeSassCompiler {
+    let resolvedCompiler = <NativeSassCompiler>compiler;
 
     if (resolvedCompiler === undefined) {
         resolvedCompiler = getDefaultSassCompiler();

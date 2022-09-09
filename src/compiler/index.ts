@@ -10,16 +10,16 @@ import { ModernSassCompiler } from './modern-sass-compiler';
 import { LegacySassCompiler } from './legacy-sass-compiler';
 
 
-export function wrapImplementation( options?: CliOptions ) : SassCompiler {
-    const defaults = <Partial<CliOptions>>{
+export function wrapCompiler( options?: CliBuildOptions ) : SassCompiler {
+    const defaults = <Partial<CliBuildOptions>>{
         cwd: CWD
     };
     const opts = _.defaultsDeep( {}, options, defaults );
 
-    opts.implementation = getSassCompiler( opts.implementation );
+    opts.compiler = getSassCompiler( opts.compiler );
     opts.postcss = getPostcss( opts.postcss );
 
-    const info = opts.implementation.info.split('\t')[0];
+    const info = opts.compiler.info.split('\t')[0];
 
     if (opts.api === 'modern') {
         if (info === 'node-sass') {

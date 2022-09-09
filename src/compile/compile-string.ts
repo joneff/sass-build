@@ -1,7 +1,7 @@
-import { wrapImplementation } from '../compiler';
+import { wrapCompiler } from '../compiler';
 
-export function sassCompileString( source: string, options?: CliOptions ) : string {
-    const compiler = wrapImplementation( options );
+export function sassCompileString( source: string, options?: CliBuildOptions ) : string {
+    const compiler = wrapCompiler( options );
 
     return compiler.compileString( source, options?.sassOptions );
 }

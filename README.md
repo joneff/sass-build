@@ -79,7 +79,7 @@ const output = {
     filename: '[name:toLower].css' // specify output file name; defaults to '[name].css'
 };
 const options = {
-    implementation: 'sass-embedded', // defaults to 'node-sass',
+    compiler: 'sass-embedded', // defaults to 'node-sass',
     api: 'modern', // defaults to 'legacy'
     sassOptions: {
         minify: true // defaults to false
@@ -109,9 +109,9 @@ module.exports = {
         // * caching
         'sass-build:recommended'
     ],
-    files: [
+    build: [
         {
-            // use packages/default as the folder in which all lookup is based. default is the process.cwd()
+            // use packages/default as the folder in which all lookup is based. default is process.cwd()
             cwd: 'packages/default',
             // path to source file, relative to cwd
             file: 'scss/all.scss',
@@ -123,7 +123,7 @@ module.exports = {
             file: 'scss/all.scss',
             outFile: 'dist/all.css',
             // use different sass implementation
-            implementation: 'sass-embedded',
+            compiler: 'sass-embedded',
             // use @use instead of @import syntax
             api: 'modern'
         }

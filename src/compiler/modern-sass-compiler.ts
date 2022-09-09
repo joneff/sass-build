@@ -21,7 +21,7 @@ export class ModernSassCompiler extends BaseSassCompiler {
         );
 
         this.before();
-        const result = (<ModernSassImplementation> this.implementation).compile( file, opts ).css;
+        const result = (<ModernSassImplementation> this.compiler).compile( file, opts ).css;
 
         return <string> this.postcss.process(result).css;
     }
@@ -36,7 +36,7 @@ export class ModernSassCompiler extends BaseSassCompiler {
         );
 
         this.before();
-        const result = (<ModernSassImplementation> this.implementation).compileString( source, opts ).css;
+        const result = (<ModernSassImplementation> this.compiler).compileString( source, opts ).css;
 
         return <string> this.postcss.process(result).css;
     }
