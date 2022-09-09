@@ -23,7 +23,7 @@ const FIXTURES_PATH = path.resolve( __dirname, '../__fixtures__' );
             fs.rmSync( `${FIXTURES_PATH}/dist`, { recursive: true, force: true } );
         });
 
-        const opts : Partial<CliOptions> = {
+        const opts : Partial<CliBuildOptions> = {
             api: 'legacy'
         };
 
@@ -33,7 +33,7 @@ const FIXTURES_PATH = path.resolve( __dirname, '../__fixtures__' );
         describe( 'sassBuild', () => {
 
             test('sassBuild compiles', () => {
-                sassBuild( file, outFile, <CliOptions> opts );
+                sassBuild( file, outFile, <CliBuildOptions> opts );
                 assert.equal( fileExists( outFile ), true );
             });
 

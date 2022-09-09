@@ -1,7 +1,7 @@
-import { wrapImplementation } from '../compiler';
+import { wrapCompiler } from '../compiler';
 
-export function sassBuild( file: string, outFile: string, options?: CliOptions ) : void {
-    const compiler = wrapImplementation( options );
+export function sassBuild( file: string, outFile: string, options?: CliBuildOptions ) : void {
+    const compiler = wrapCompiler( options );
 
     compiler.build( file, outFile, options?.sassOptions );
 }

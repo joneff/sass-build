@@ -1,7 +1,7 @@
 import argsParser from 'yargs-parser';
 
 import * as commands from './commands';
-import { processConfig } from './process-config';
+import { processConfigFile } from '../config';
 import {
     exit,
     logger
@@ -61,7 +61,7 @@ export function cli() {
         logger.silly('cli', 'No config passed.');
     }
 
-    processConfig( config );
+    processConfigFile( config );
     exitSuccess();
 }
 

@@ -24,7 +24,7 @@ export class LegacySassCompiler extends BaseSassCompiler {
         );
 
         this.before();
-        const result = (<LegacySassImplementation> this.implementation).renderSync(opts).css.toString('utf-8');
+        const result = (<LegacySassImplementation> this.compiler).renderSync(opts).css.toString('utf-8');
 
         return <string> this.postcss.process(result).css;
     }
@@ -40,7 +40,7 @@ export class LegacySassCompiler extends BaseSassCompiler {
         );
 
         this.before();
-        const result = (<LegacySassImplementation> this.implementation).renderSync(opts).css.toString('utf-8');
+        const result = (<LegacySassImplementation> this.compiler).renderSync(opts).css.toString('utf-8');
 
         return <string> this.postcss.process(result).css;
     }

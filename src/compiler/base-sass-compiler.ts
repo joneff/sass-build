@@ -13,13 +13,13 @@ import {
 } from '../utils';
 
 export abstract class BaseSassCompiler implements SassCompiler {
-    protected implementation: SassImplementation;
+    protected compiler: NativeSassCompiler;
     protected postcss: PostcssProcessor;
-    protected options: CliOptions;
+    protected options: CliBuildOptions;
 
-    constructor(options: CliOptions) {
+    constructor(options: CliBuildOptions) {
         this.options = options;
-        this.implementation = <SassImplementation> this.options.implementation;
+        this.compiler = <NativeSassCompiler> this.options.compiler;
         this.postcss = <PostcssProcessor> this.options.postcss;
     }
 
@@ -118,6 +118,6 @@ export abstract class BaseSassCompiler implements SassCompiler {
     }
 
     get info(): string {
-        return this.implementation.info;
+        return this.compiler.info;
     }
 }
