@@ -37,7 +37,7 @@ function transformFile( file: string, outFile: string, options: CliTransformOpti
         trimCwd(CWD, outFile)
     );
 
-    const result = baka.compile( file, { cwd: _cwd } );
+    const result = baka.compile( file, <baka.CompileOptions> { cwd: _cwd } );
 
     writeFile( outFile, result.content );
 }

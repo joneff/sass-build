@@ -6,7 +6,9 @@
         "moduleResolution": "node",
         "isolatedModules": true,
         "esModuleInterop": true,
-        "declaration": false
+        "noEmit": true,
+        "declaration": false,
+        "emitDeclarationOnly": false
     },
     "include": [
         "src/**/*.ts"
