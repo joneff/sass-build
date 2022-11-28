@@ -20,7 +20,7 @@ export const JsonThemeTransformer : CliTransformer = {
 
 function __jsonTransformer(jsonFile) {
     const json = JSON.parse(fs.readFileSync(jsonFile, 'utf-8'));
-    const sassContent = [];
+    const sassContent : string[] = [];
     let groups;
 
     if (Array.isArray(json)) {

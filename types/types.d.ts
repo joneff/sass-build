@@ -76,6 +76,13 @@ declare type BuildStageEntry = ConfigStageEntry & CliBuildOptions;
 declare type BundleStageEntry = ConfigStageEntry & CliBundleOptions;
 // #endregion
 
+// #region OutputOptions
+declare type OutputOptions = {
+    path: string;
+    filename: string;
+}
+// #endregion
+
 declare module 'sass-build' {
     export function sassCompile(file: string, options?: CliBuildOptions): string;
     export function sassCompileString(source: string, options?: CliBuildOptions): string;
