@@ -4,10 +4,10 @@ declare type ModernImporterResult = {
     syntax?: 'css' | 'scss' | 'indented';
 };
 
-declare type LegacyImporterResult = { file: string } | { contents: string };
+declare type LegacyImporterResult = { file: string } | { contents: string } | null;
 
 declare type SassImporter = {
-    (url: string) : null | LegacyImporterResult;
+    (url: string) : LegacyImporterResult;
     name?: string;
     findFileUrl( url: string ) : null | URL;
     canonicalize?( url: string ) : null | URL;

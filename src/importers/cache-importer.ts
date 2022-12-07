@@ -1,7 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 
-const EMPTY_IMPORT = {};
+const EMPTY_IMPORT_RESULT = <LegacyImporterResult> {};
 
 export function sassCacheImporter( options: CacheImporterOptions = { cache: true } ) : SassImporter {
 
@@ -10,7 +10,7 @@ export function sassCacheImporter( options: CacheImporterOptions = { cache: true
         ? cache
         : new Set();
 
-    function sassCacheImporter( url: string, prev: string ) : null | LegacyImporterResult {
+    function sassCacheImporter( url: string, prev: string ) : LegacyImporterResult {
 
         // If previous file is stdin, then we are importing from a string
         if (prev === 'stdin') {
@@ -26,7 +26,7 @@ export function sassCacheImporter( options: CacheImporterOptions = { cache: true
         if ( fs.existsSync( file ) ) {
 
             if ( cache && imported.has( file ) ) {
-                return <LegacyImporterResult> EMPTY_IMPORT;
+                return EMPTY_IMPORT_RESULT;
             }
 
             imported.add( file );
