@@ -48,5 +48,5 @@ export function sassCacheImporter( options: CacheImporterOptions = { cache: true
         return null;
     };
 
-    return <SassImporter>sassCacheImporter;
+    return <SassImporter> sassCacheImporter;
 }
