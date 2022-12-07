@@ -1,3 +1,4 @@
+import fs from 'fs';
 import path from 'path';
 import { pathToFileURL } from 'url';
 
@@ -16,17 +17,28 @@ export function sassPackageImporter( options?: PackageImporterOptions ) : SassIm
 
     function sassPackageImporter( url: string ) : LegacyImporterResult {
 
-        if ( !url.startsWith('~') ) {
+        // If the file exists, don't process it
+        if ( fs.existsSync( url ) ) {
             return null;
         }
 
+        // Remove leading tilde, if any
+        if ( url.startsWith('~') ) {
+            // eslint-disable-next-line no-param-reassign
+            url = url.slice(1);
+        }
+
         const file = path.resolve(
-            <string>cwd,
-            <string>nodeModules,
-            url.slice(1)
+            <string> cwd,
+            <string> nodeModules,
+            url
         );
 
-        return { file };
+        if ( fs.existsSync( file ) ) {
+            return { file };
+        }
+
+        return null;
     }
     sassPackageImporter.name = 'sassPackageImporter';
     sassPackageImporter.before = function( context: { cwd: string } ) : void {
@@ -35,18 +47,29 @@ export function sassPackageImporter( options?: PackageImporterOptions ) : SassIm
 
     sassPackageImporter.findFileUrl = function( url: string ) : null | URL {
 
-        if ( !url.startsWith('~') ) {
+        // If the file exists, don't process it
+        if ( fs.existsSync( url ) ) {
             return null;
         }
 
+        // Remove leading tilde, if any
+        if ( url.startsWith('~') ) {
+            // eslint-disable-next-line no-param-reassign
+            url = url.slice(1);
+        }
+
         const file = path.resolve(
-            <string>cwd,
-            <string>nodeModules,
-            url.slice(1)
+            <string> cwd,
+            <string> nodeModules,
+            url
         );
 
-        return pathToFileURL( file );
+        if ( fs.existsSync( file ) ) {
+            return pathToFileURL( file );
+        }
+
+        return null;
     };
 
-    return <SassImporter>sassPackageImporter;
+    return <SassImporter> sassPackageImporter;
 }
