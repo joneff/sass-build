@@ -14,7 +14,7 @@ export function sassPackageImporter( options?: PackageImporterOptions ) : SassIm
         nodeModules = nodeModules();
     }
 
-    function sassPackageImporter( url: string ) : null | LegacyImporterResult {
+    function sassPackageImporter( url: string ) : LegacyImporterResult {
 
         if ( !url.startsWith('~') ) {
             return null;
