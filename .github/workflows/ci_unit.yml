@@ -26,25 +26,26 @@ jobs:
           node-version: 16.x
 
       - name: Install
-        run: npm ci
+        run: |
+          npm ci
+
+      - name: Build
+        run: |
+          npm run build
 
       - name: Lint scripts
-        run: npm run eslint
+        run: |
+          npm run eslint
 
       - name: Run tests
-        run: npm run test
+        run: |
+          npm run test
 
 
   ci-unit:
     name: CI | Unit
     needs: run-tests
     runs-on: ubuntu-latest
-
     steps:
-
-      # IMPORTANT NOTE
-      #
-      # You can not set a workflow to be status check. The job is. Hence the trickery...
-
       - name: Done
         run: echo "Done!"
