@@ -1,3 +1,5 @@
+import fs from 'fs';
+import path from 'path';
 import argsParser from 'yargs-parser';
 
 import * as commands from './commands';
@@ -6,6 +8,8 @@ import {
     exit,
     logger
 } from '../utils';
+
+const version = JSON.parse( fs.readFileSync( path.resolve( __dirname, '../../package.json' ), 'utf8' ) ).version;
 
 export function cli() {
     logger.time('cli:start');
@@ -31,8 +35,6 @@ export function cli() {
     }
 
     if (argv.version) {
-        // eslint-disable-next-line @typescript-eslint/no-var-requires
-        const version = require('../package.json').version;
         process.stdout.write(`${version}\n`);
         process.exit(0);
     }
