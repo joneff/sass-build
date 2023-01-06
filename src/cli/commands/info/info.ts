@@ -1,10 +1,21 @@
+import { exit } from "../../../utils";
+import { validateParams } from './validate-params';
+
 const compilerList = [
     'node-sass',
     'sass',
     'sass-embedded'
 ];
 
-export function cliInfo() {
+export function cliInfo( params ) {
+
+    try {
+        validateParams( params );
+    } catch ( err ) {
+        exit( 1, 'error', 'cli > info', err.message );
+    }
+
+
     const compilerInfo = getCompilerInfo(compilerList);
 
     if (compilerInfo.length > 0) {

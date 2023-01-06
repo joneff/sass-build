@@ -3,73 +3,87 @@ import path from 'path';
 import argsParser from 'yargs-parser';
 
 import * as commands from './commands';
+import { validateParams } from './validate-params';
 import { processConfigFile } from '../config';
 import {
     exit,
     logger
 } from '../utils';
 
-const version = JSON.parse( fs.readFileSync( path.resolve( __dirname, '../../package.json' ), 'utf8' ) ).version;
+const VERSION = JSON.parse( fs.readFileSync( path.resolve( __dirname, '../../package.json' ), 'utf8' ) ).version;
+const ARGS_PARSER_OPTIONS : argsParser.Options = {
+    alias: {
+        'f': 'file',
+        's': 'source',
+        'g': 'glob',
+        'd': 'out-file',
+        'o': 'out-dir',
+        't': 'transformer',
+        'c': 'config'
+    },
+    string: [ 'file', 'source', 'glob', 'out-file', 'out-dir', 'transformer', 'config' ],
+    boolean: [ 'debug' ]
+};
 
 export function cli() {
-    logger.time('cli:start');
+    logger.time( 'cli:start' );
 
-    const argv = argsParser(process.argv.slice(2), {
-        alias: {
-            'f': 'file',
-            's': 'source',
-            'g': 'glob',
-            'd': 'out-file',
-            'o': 'out-dir',
-            't': 'transformer',
-            'c': 'config'
-        },
-        string: [ 'file', 'source', 'glob', 'out-file', 'out-dir', 'transformer', 'config' ],
-        boolean: [ 'debug' ]
-    });
+    const argv = argsParser( process.argv.slice(2), ARGS_PARSER_OPTIONS );
 
-    if (argv.debug) {
-        logger.level = 'debug';
-        logger.silly('cli', 'Starting in debug mode.');
-        logger.silly('cli', 'Arguments parsed.');
+    try {
+        validateParams( argv, ARGS_PARSER_OPTIONS );
+    } catch ( err ) {
+        exit( 1, 'error', 'cli', err.message );
     }
 
-    if (argv.version) {
-        process.stdout.write(`${version}\n`);
+    const {
+        _: commandList,
+        file, source, glob, outFile, outDir, transformer,
+        config, debug, version
+    } = argv;
+    const commandName = <string> commandList[0];
+    const command = commands.get( commandName );
+    const params = { file, source, glob, outFile, outDir, transformer };
+
+    if ( version ) {
+        process.stdout.write( `${VERSION}\n` );
         process.exit(0);
     }
 
-    const commandName = argv._[0];
-    const config = argv['config'];
-
-    if (typeof commandName === 'string') {
-        logger.silly('cli', 'Command passed');
-
-        const command = getCommand(commandName);
-        logger.silly('cli', 'Command is: %s', commandName);
-
-        if (typeof command === 'function') {
-            logger.silly('cli', 'Command found.');
-            command(argv);
-            exitSuccess();
-        } else {
-            exit(127, 'error', `Command not found: ${commandName}`);
-        }
-    } else {
-        logger.silly('cli', 'No command passed.');
+    if ( debug ) {
+        logger.level = 'debug';
+        logger.silly( 'cli', 'Starting in debug mode.' );
+        logger.silly( 'cli', 'Arguments parsed.' );
     }
 
-    if (!config) {
-        logger.silly('cli', 'No config passed.');
+    if ( commandName ) {
+        logger.silly( 'cli', 'Command passed' );
+        logger.silly( 'cli', 'Command is: %s', commandName );
+
+        command( params );
+        exitSuccess();
+    }
+    logger.silly( 'cli', 'No command passed.' );
+
+    if ( config ) {
+        logger.silly( 'cli', 'Config passed' );
+
+        processConfigFile( config );
+        exitSuccess();
     }
 
-    processConfigFile( config );
+    logger.silly( 'cli', 'No config passed.' );
+
+    if ( Object.keys(params).length > 0 ) {
+        logger.silly( 'cli', 'Parameters passed.' );
+        logger.silly( 'cli', 'Falling back to build command' );
+
+        commands.get( 'build' )( params );
+        exitSuccess();
+    }
+
+    processConfigFile( null );
     exitSuccess();
-}
-
-function getCommand(name) {
-    const commandName = 'cli' + name[0].toUpperCase() + name.slice(1);
-    return commands[commandName];
 }
 
 function exitSuccess() {
