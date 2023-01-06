@@ -1,16 +1,9 @@
-declare type ApiType = 'modern' | 'legacy';
-
 declare type CommonCliOptions = {
     cwd: string;
 }
 
 
-declare type CliBuildOptions = CommonCliOptions & {
-    compiler: string | NativeSassCompiler;
-    api: ApiType;
-    postcss: false | 'auto' | [] | PostcssProcessor;
-    sassOptions: SassOptions;
-}
+declare type CliBuildOptions = CommonCliOptions & SassCompilerOptions;
 declare type CliBuilder = string | Function | {
     buildFile: Function;
     buildGlob: Function;

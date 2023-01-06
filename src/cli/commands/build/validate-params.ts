@@ -22,6 +22,15 @@ export function validateParams( params ) {
         }
     }
 
+    if ( source !== undefined ) {
+        if ( typeof source !== 'string' ) {
+            throw new Error( '--source must be string.' );
+        }
+        if (outFile === undefined) {
+            throw new Error( 'Supply --outFile.' );
+        }
+    }
+
     if ( glob !== undefined ) {
         if (typeof glob !== 'string' && !Array.isArray(glob)) {
             throw new Error( '--glob must be either string or array.' );
@@ -29,13 +38,9 @@ export function validateParams( params ) {
         if (glob === '' || (Array.isArray( glob ) && glob.length === 0 ) ) {
             throw new Error( '--glob must not be empty.' );
         }
-        if (Array.isArray(glob) && outFile) {
+        if (outFile) {
             throw new Error( 'Supply --outDir instead of --outFile.' );
         }
-    }
-
-    if ( source !== undefined && typeof source !== 'string' ) {
-        throw new Error( '--source must be string.' );
     }
 
     if ( outFile !== undefined && typeof outFile !== 'string' ) {

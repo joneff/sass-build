@@ -10,7 +10,7 @@
   ],
   "main": "dist/index.js",
   "bin": "bin/sass-build.js",
-  "types": "lib/types/index.d.ts",
+  "types": "types/index.d.ts",
   "files": [
     "bin/",
     "dist/",

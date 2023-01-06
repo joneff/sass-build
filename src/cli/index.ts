@@ -1,3 +1,5 @@
+/// <reference path="../../types/index.d.ts" />
+
 import fs from 'fs';
 import path from 'path';
 import argsParser from 'yargs-parser';
@@ -30,6 +32,24 @@ export function cli() {
 
     const argv = argsParser( process.argv.slice(2), ARGS_PARSER_OPTIONS );
 
+    const { command, params, config } = parseArgs( argv );
+
+    if ( typeof command === 'function' ) {
+        command( params );
+        exitSuccess();
+    }
+
+    if ( config !== undefined ) {
+        processConfigFile( config );
+        exitSuccess();
+    }
+
+    process.stdout.write( 'No command passed and no default config found!\n' );
+    process.exit(0);
+}
+
+function parseArgs( argv : argsParser.Arguments ) : { command?: Function, params?: any, config?: string } {
+
     try {
         validateParams( argv, ARGS_PARSER_OPTIONS );
     } catch ( err ) {
@@ -53,37 +73,38 @@ export function cli() {
     if ( debug ) {
         logger.level = 'debug';
         logger.silly( 'cli', 'Starting in debug mode.' );
-        logger.silly( 'cli', 'Arguments parsed.' );
     }
 
     if ( commandName ) {
-        logger.silly( 'cli', 'Command passed' );
         logger.silly( 'cli', 'Command is: %s', commandName );
 
-        command( params );
-        exitSuccess();
+        return { command, params };
     }
     logger.silly( 'cli', 'No command passed.' );
 
     if ( config ) {
-        logger.silly( 'cli', 'Config passed' );
+        logger.silly( 'cli', 'Config passed: %s', config );
 
-        processConfigFile( config );
-        exitSuccess();
+        return { config };
     }
-
     logger.silly( 'cli', 'No config passed.' );
 
-    if ( Object.keys(params).length > 0 ) {
-        logger.silly( 'cli', 'Parameters passed.' );
-        logger.silly( 'cli', 'Falling back to build command' );
+    const hasParams = Object.values(params).filter( item => item !== undefined).length > 0;
+    const hasConfig = fs.existsSync( 'sass.config.js' );
 
-        commands.get( 'build' )( params );
-        exitSuccess();
+    if ( hasParams ) {
+        logger.silly( 'cli', 'Attempting build command with cli parameters' );
+
+        return { command: commands.get( 'build' ), params };
     }
 
-    processConfigFile( null );
-    exitSuccess();
+    if ( hasConfig ) {
+        logger.silly( 'cli', 'Attempting to process default config' );
+
+        return { config: null };
+    }
+
+    return {};
 }
 
 function exitSuccess() {

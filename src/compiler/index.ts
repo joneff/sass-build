@@ -10,11 +10,11 @@ import { ModernSassCompiler } from './modern-sass-compiler';
 import { LegacySassCompiler } from './legacy-sass-compiler';
 
 
-export function wrapCompiler( options?: CliBuildOptions ) : SassCompiler {
-    const defaults = <Partial<CliBuildOptions>>{
+export function wrapCompiler( options?: SassCompilerOptions ) : SassCompiler {
+    const defaults = <Partial<SassCompilerOptions>> {
         cwd: CWD
     };
-    const opts = _.defaultsDeep( {}, options, defaults );
+    const opts = <SassCompilerOptions> _.defaultsDeep( {}, options, defaults );
 
     opts.compiler = getSassCompiler( opts.compiler );
     opts.postcss = getPostcss( opts.postcss );

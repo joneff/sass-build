@@ -26,16 +26,22 @@ export function validateParams( argv: argsParser.Arguments, argsParserOpts: args
         throw new Error( 'Unknown parameters passed.' );
     }
 
-    // Throw error for extra parameters for version command
-    if ( version
+    // Throw error for command with --version parameter
+    if ( version && commandName !== undefined ) {
+        throw new Error( '--version parameter cannot be passed to commands.' );
+    }
+
+    // Throw error for --version parameter with other parameters
+    if (
+        version
         && (
-            commandName
+            params.length > 0
             || restParams.length > 0
             || config
             || debug
         )
     ) {
-        throw new Error( 'Version parameter cannot be passed with other parameters.' );
+        throw new Error( '--version parameter cannot be used with other parameters.' );
     }
 
     // Throw error for empty command name
@@ -45,37 +51,37 @@ export function validateParams( argv: argsParser.Arguments, argsParserOpts: args
 
     // Throw error for unknown command
     if ( commandName !== undefined && typeof command !== 'function' ) {
-        throw new Error( `Command not found: ${commandName}` );
-    }
-
-    // Throw error for command and config passed together
-    if ( commandName !== undefined && config !== undefined) {
-        throw new Error( `Command ${commandName} and config param cannot be passed together.` );
+        throw new Error( `Command not found: ${commandName}.` );
     }
 
     // Throw error for debug parameter for info
     if ( commandName === 'info' && debug ) {
-        throw new Error( 'Debug parameter cannot be passed with info command.' );
+        throw new Error( '--debug parameter cannot be passed to "info" command.' );
+    }
+
+    // Throw error for command with config parameter
+    if ( commandName !== undefined && config !== undefined) {
+        throw new Error( '--config parameter cannot be passed to commands.' );
     }
 
     // Throw error for extra parameters for config
     if ( config !== undefined && params.length > 0 ) {
-        throw new Error( 'Config parameter cannot be passed with other parameters.' );
+        throw new Error( '--config parameter cannot be used with other parameters.' );
     }
 
     if ( file !== undefined && source !== undefined ) {
-        throw new Error( 'File and source parameters cannot be passed together.' );
+        throw new Error( '--file and --source parameters cannot be used together.' );
     }
 
     if ( file !== undefined && glob !== undefined ) {
-        throw new Error( 'File and glob parameters cannot be passed together.' );
+        throw new Error( '--file and --glob parameters cannot be used together.' );
     }
 
     if ( source !== undefined && glob !== undefined ) {
-        throw new Error( 'Source and glob parameters cannot be passed together.' );
+        throw new Error( '--source and --glob parameters cannot be used together.' );
     }
 
     if ( outFile !== undefined && outDir !== undefined ) {
-        throw new Error( 'Out file and out dir parameters cannot be passed together.' );
+        throw new Error( '--outFile and --outDir parameters cannot be used together.' );
     }
 }
