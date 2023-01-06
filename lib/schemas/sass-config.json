@@ -1,0 +1,192 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema",
+    "$id": "@joneff/sass-config.json",
+    "title": "Sass Config Definition",
+
+    "properties": {
+        "$schema": {
+            "type": "string"
+        },
+        "extends": {
+            "$ref": "#/$types/stringOrStrings"
+        },
+        "files": {
+            "description": "A list of files",
+            "$ref": "#/$defs/fileList"
+        },
+        "bundles": {
+            "$ref": "#/$defs/bundleList"
+        },
+        "sassOptions": {
+            "$ref": "#/$defs/sassOptions"
+        },
+        "plugins": {
+            "$ref": "#/$defs/plugins"
+        }
+    },
+    "additionalProperties": false,
+    "required": [ "$schema" ],
+    "anyOf": [
+        { "required": [ "files" ] },
+        { "required": [ "bundles" ] }
+    ],
+
+    "$defs": {
+        "fileList": {
+            "type": "array",
+            "items": {
+                "anyOf": [
+                    { "$ref": "#/$types/string" },
+                    { "$ref": "#/$defs/file" },
+                    { "$ref": "#/$defs/fileDfn" }
+                ]
+            },
+            "uniqueItems": true
+        },
+        "file": {
+            "type": "object",
+            "properties": {
+                "file": { "$ref": "#/$types/string" },
+                "outFile": { "$ref": "#/$defs/outFile" },
+                "sassOptions": { "$ref": "#/$defs/sassOptions" }
+            },
+            "required": [ "file" ],
+            "additionalProperties": false
+        },
+        "fileDfn": {
+            "type": "object",
+            "properties": {
+                "files": { "$ref": "#/$types/stringOrStrings" },
+                "output": { "$ref": "#/$defs/output" },
+                "sassOptions": { "$ref": "#/$defs/sassOptions" }
+            },
+            "required": [ "files" ],
+            "additionalProperties": false
+        },
+
+        "bundleList": {
+            "type": "array",
+            "items": {
+                "anyOf": [
+                    { "$ref": "#/$types/string" },
+                    { "$ref": "#/$defs/bundle" }
+                ]
+            },
+            "uniqueItems": true
+        },
+        "bundle": {
+            "type": "object",
+            "properties": {
+                "files": { "$ref": "#/$types/stringOrStrings" },
+                "output": { "$ref": "#/$defs/output" },
+                "sassOptions": { "$ref": "#/$defs/sassOptions" }
+            },
+            "required": [ "files" ],
+            "additionalProperties": false
+        },
+
+        "outFile": { "$ref": "#/$types/string" },
+        "output": {
+            "type": "object",
+            "properties": {
+                "filename": { "$ref": "#/$types/string" },
+                "path": { "$ref": "#/$types/string" }
+            }
+        },
+
+        "sassOptions": {
+            "type": "object",
+            "properties": {
+                "includePaths": {
+                    "description": "This array of strings option provides load paths for Sass to look for stylesheets. Earlier load paths will take precedence over later ones.",
+                    "markdownDescription": "An array of strings option that provides load paths for Sass to look for stylesheets. Earlier load paths will take precedence over later ones.",
+                    "$ref": "#/$types/string[]"
+                },
+                "charset": {
+                    "description": "By default, if the CSS document contains non-ASCII characters, Sass adds a @charset declaration (in expanded output mode) or a byte-order mark (in compressed mode) to indicate its encoding to browsers or other consumers. If charset is false, these annotations are omitted.",
+                    "markdownDescription": "By default, if the CSS document contains non-ASCII characters, Sass adds a `@charset` declaration (in expanded output mode) or a byte-order mark (in compressed mode) to indicate its encoding to browsers or other consumers. If `charset` is `false`, these annotations are omitted.",
+                    "$ref": "#/$types/boolean"
+                },
+                "indentType": {
+                    "description": "Whether the generated CSS should use spaces or tabs for indentation.",
+                    "markdownDescription": "Whether the generated CSS should use spaces or tabs for indentation.",
+                    "$ref": "#/$types/string",
+                    "enum": [
+                        "tab",
+                        "space"
+                    ]
+                },
+                "indentWidth": {
+                    "description": "How many spaces or tabs (depending on indentType) should be used per indentation level in the generated CSS. It must be between 0 and 10 (inclusive).",
+                    "markdownDescription": "How many spaces or tabs (depending on indentType) should be used per indentation level in the generated CSS. It must be between 0 and 10 (inclusive).",
+                    "$ref": "#/$types/number",
+                    "minimum": 0,
+                    "maximum": 10
+                },
+                "linefeed": {
+                    "description": "Which character sequence to use at the end of each line in the generated CSS. It can have the following values: lf, lfcr, cr or crlf",
+                    "markdownDescription": "Which character sequence to use at the end of each line in the generated CSS. It can have the following values: `lf`, `lfcr`, `cr` or `crlf`",
+                    "$ref": "#/$types/string",
+                    "enum": [
+                        "lf",
+                        "lfcr",
+                        "cr",
+                        "crlf"
+                    ]
+                },
+                "outputStyle": {
+                    "description": "The output style of the compiled CSS. There are four possible output styles: expanded, compressed, nested and compact",
+                    "markdownDescription": "The output style of the compiled CSS. There are four possible output styles: `expanded`, `compressed`, `nested` and `compact`",
+                    "$ref": "#/$types/string",
+                    "enum": [
+                        "expanded",
+                        "compressed",
+                        "nested",
+                        "compact"
+                    ],
+                    "enumDescriptions": [
+                        "Writes each selector and declaration on its own line. Default for dart-sass.",
+                        "Removes as many extra characters as possible, and writes the entire stylesheet on a single line",
+                        "Indents CSS rules to match the nesting of the Sass source. Default for node-sass, not supported by dart-sass.",
+                        "Puts each CSS rule on its own single line. Not supported by dart-sass"
+                    ]
+                },
+                "functions": {
+                    "description": "Additional built-in Sass functions that are available in all stylesheets.",
+                    "markdownDescription": "Additional built-in Sass functions that are available in all stylesheets.",
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "name": { "$ref": "#/$types/string" },
+                            "fn": { "$ref": "#/$types/string" }
+                        },
+                        "required": [ "name", "fn" ],
+                        "additionalProperties": false
+                    },
+                    "minItems": 1
+                },
+                "importers": {
+                    "description": "Custom importers that control how Sass resolves loads from rules like @use and @import.",
+                    "markdownDescription": "Custom importers that control how Sass resolves loads from rules like `@use` and `@import`.",
+                    "$ref": "#/$types/string[]"
+                }
+            },
+            "additionalProperties": false
+        },
+        "plugins": {}
+    },
+
+    "$types": {
+        "boolean": { "type": "boolean" },
+        "number": { "type": "number" },
+        "string": { "type": "string" },
+        "string[]": { "type": "array", "items": { "type": "string" } },
+        "stringOrStrings": {
+            "oneOf": [
+                { "$ref": "#/$types/string" },
+                { "$ref": "#/$types/string[]" }
+            ]
+        }
+    }
+}

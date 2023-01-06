@@ -1,0 +1,34 @@
+{
+    "$schema": "../../lib/schemas/sass-config.json",
+    "files": [
+        "**/*.scss",
+        {
+            "file": "",
+            "outFile": ""
+        },
+        {
+            "files": ["false"],
+            "output": {
+                "filename": "",
+                "path": ""
+            }
+        }
+    ],
+    "bundles": [
+        "**/*.scss",
+        {
+            "files": "",
+            "output": {
+                "filename": "",
+                "path": ""
+            }
+        }
+    ],
+    "sassOptions": {
+        "indentWidth": 0,
+        "outputStyle": "compact"
+    },
+    "plugins": [
+
+    ]
+}
