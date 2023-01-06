@@ -1,8 +1,8 @@
 import {
     exit,
     logger
-} from "../../utils";
-import { sassBuild, sassBuildFiles, sassBuildString } from '../../build';
+} from "../../../utils";
+import { sassBuild, sassBuildFiles, sassBuildString } from '../../../build';
 
 type CliBuildParams = {
     file: string | string[];

@@ -1,8 +1,8 @@
 import {
     exit,
     logger
-} from "../../utils";
-import { migrate } from '../../migrate';
+} from "../../../utils";
+import { migrate } from '../../../migrate';
 
 type CliMigrateParams = {
     file: string;
