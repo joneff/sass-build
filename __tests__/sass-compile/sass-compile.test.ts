@@ -15,7 +15,7 @@ const FIXTURES_PATH = path.resolve( __dirname, '../__fixtures__' );
             logger.level = 'error';
         });
 
-        const opts : Partial<CliBuildOptions> = {
+        const opts : Partial<SassCompilerOptions> = {
             api: 'legacy'
         };
 
@@ -25,7 +25,7 @@ const FIXTURES_PATH = path.resolve( __dirname, '../__fixtures__' );
         describe( 'sassCompile', () => {
 
             test('sassCompile compiles', () => {
-                const fileContent = sassCompile( file, <CliBuildOptions> opts );
+                const fileContent = sassCompile( file, <SassCompilerOptions> opts );
                 assert.notEqual( fileContent, '' );
             });
 
@@ -35,13 +35,13 @@ const FIXTURES_PATH = path.resolve( __dirname, '../__fixtures__' );
 
             test('minify: true', () => {
                 const sassOptions : Partial<SassOptions> = { minify: true };
-                const fileContent = sassCompile( file, <CliBuildOptions> { ...opts, sassOptions } );
+                const fileContent = sassCompile( file, <SassCompilerOptions> { ...opts, sassOptions } );
 
                 assert.equal( fileContent, 'body{color:red}\n' );
             });
             test('minify: false', () => {
                 const sassOptions : Partial<SassOptions> = { minify: false };
-                const fileContent = sassCompile( file, <CliBuildOptions> { ...opts, sassOptions } );
+                const fileContent = sassCompile( file, <SassCompilerOptions> { ...opts, sassOptions } );
 
                 assert.equal( fileContent, 'body {\n    color: red;\n}\n' );
             });
@@ -52,7 +52,7 @@ const FIXTURES_PATH = path.resolve( __dirname, '../__fixtures__' );
 
             test('correct path', () => {
                 const sassOptions : Partial<SassOptions> = { loadPaths: [ FIXTURES_PATH ] };
-                const fileContent = sassCompile( nestedFile, <CliBuildOptions> { ...opts, sassOptions } );
+                const fileContent = sassCompile( nestedFile, <SassCompilerOptions> { ...opts, sassOptions } );
 
                 assert.notEqual( fileContent, '' );
             });
