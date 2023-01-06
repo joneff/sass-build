@@ -1,8 +1,8 @@
 import {
     exit,
     logger
-} from "../../utils";
-import { sassCompile, sassCompileString } from '../../compile';
+} from "../../../utils";
+import { sassCompile, sassCompileString } from '../../../compile';
 
 type CliCompileParams = {
     file: string;
