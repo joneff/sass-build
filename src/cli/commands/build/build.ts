@@ -30,7 +30,11 @@ export function cliBuild( params ) {
         if (typeof file === 'string') {
             logger.silly( 'cli > build', '--file is string.' );
             logger.silly( 'cli > build', 'Attempting to build...' );
-            sassBuild( file, outFile );
+            if ( outFile !== undefined ) {
+                sassBuild( file, outFile );
+            } else {
+                sassBuildFiles( [ file ] );
+            }
             logger.silly( 'cli > build', 'Build successful.' );
         }
 
@@ -60,7 +64,7 @@ export function cliBuild( params ) {
         }
     }
 
-    if (source) {
+    if ( source ) {
         logger.silly('cli > build', '--source parameter passed.');
 
         logger.silly('cli > build', 'Attempting to build...');
