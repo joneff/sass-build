@@ -1,50 +1,59 @@
-name: CI | Unit
-
-defaults:
-  run:
-    shell: bash
+name: CI
 
 on:
   push:
-    branches:
-      - '**'
+    branches-ignore:
+      - 'master'
+      - 'develop'
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
 
-  run-tests:
-    name: Run tests
+  lint-scripts:
+    name: Lint scripts
+    uses: ./.github/workflows/_lint-scripts.yml
+
+  ci-lint-scripts:
+    name: Status check > Lint scripts
     runs-on: ubuntu-latest
-
+    needs: [ lint-scripts ]
     steps:
-
-      - name: Checkout branch
-        uses: actions/checkout@v2
-
-      - name: Setup node
-        uses: actions/setup-node@v2
-        with:
-          node-version: 16.x
-
-      - name: Install
-        run: |
-          npm ci
-
-      - name: Build
-        run: |
-          npm run build
-
-      - name: Lint scripts
-        run: |
-          npm run eslint
-
-      - name: Run tests
-        run: |
-          npm run test
+      - name: Done
+        run: echo "Done!"
 
 
-  ci-unit:
-    name: CI | Unit
-    needs: run-tests
+  build:
+    name: Build
+    uses: ./.github/workflows/_build.yml
+
+  ci-build:
+    name: Status check > Build
+    runs-on: ubuntu-latest
+    needs: [ build ]
+    steps:
+      - name: Done
+        run: echo "Done!"
+
+
+  unit-tests:
+    name: Unit tests
+    uses: ./.github/workflows/_unit-tests.yml
+
+  ci-unit-tests:
+    name: Status check > Unit tests
+    runs-on: ubuntu-latest
+    needs: [ unit-tests ]
+    steps:
+      - name: Done
+        run: echo "Done!"
+
+
+  ci:
+    name: Status check > CI
+    needs: [ ci-lint-scripts, ci-build, ci-unit-tests ]
     runs-on: ubuntu-latest
     steps:
       - name: Done

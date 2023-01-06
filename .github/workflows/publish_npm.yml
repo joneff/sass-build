@@ -1,20 +1,17 @@
-name: Release stable channel
+name: Publish to npm
 
-defaults:
-  run:
-    shell: bash
-
-on: [workflow_dispatch]
+on:
+  workflow_dispatch:
 
 jobs:
 
-  release-stable:
+  publish-npm:
     runs-on: ubuntu-latest
 
     steps:
 
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           ref: master
 
@@ -24,13 +21,16 @@ jobs:
           git reset --hard origin/master
           git merge --ff-only --quiet origin/develop
 
-      - name: Setup node
-        uses: actions/setup-node@v2
+      - name: Use cache for root node_modules
+        id: cache-root-node_modules
+        uses: actions/cache@v3
         with:
-          node-version: 16.x
+          path: node_modules
+          key: root-node_modules-${{ steps.setup-node.outputs.node-version }}-${{ hashFiles('package-lock.json') }}
 
       - name: Install
-        run: npm ci
+        if: steps.cache-root-node_modules.outputs.cache-hit != 'true'
+        run: npm ci --no-audit --no-fund
 
       - name: Publish
         run: npx semantic-release
