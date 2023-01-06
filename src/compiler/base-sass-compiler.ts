@@ -15,9 +15,9 @@ import {
 export abstract class BaseSassCompiler implements SassCompiler {
     protected compiler: NativeSassCompiler;
     protected postcss: PostcssProcessor;
-    protected options: CliBuildOptions;
+    protected options: SassCompilerOptions;
 
-    constructor(options: CliBuildOptions) {
+    constructor(options: SassCompilerOptions) {
         this.options = options;
         this.compiler = <NativeSassCompiler> this.options.compiler;
         this.postcss = <PostcssProcessor> this.options.postcss;

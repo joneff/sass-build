@@ -9,9 +9,9 @@ declare type LegacyImporterResult = { file: string } | { contents: string } | nu
 declare type SassImporter = {
     (url: string) : LegacyImporterResult;
     name?: string;
-    findFileUrl( url: string ) : null | URL;
-    canonicalize?( url: string ) : null | URL;
-    load?( canonicalUrl: URL ) : null | ModernImporterResult;
+    findFileUrl(url: string) : null | URL;
+    canonicalize?(url: string) : null | URL;
+    load?(canonicalUrl: URL) : null | ModernImporterResult;
     before?(): void;
     after?(): void;
 }
