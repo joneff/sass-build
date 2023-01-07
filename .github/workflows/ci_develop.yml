@@ -1,0 +1,17 @@
+name: CI Develop
+
+on:
+  push:
+    branches:
+      - 'develop'
+
+concurrency:
+  group: ci-develop-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+
+  # Cache should be primed only from develop branch
+  prime-cache:
+    name: Prime cache
+    uses: ./.github/workflows/_prime-cache.yml
