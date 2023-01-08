@@ -30,10 +30,11 @@ export function cliBuild( params ) {
         if (typeof file === 'string') {
             logger.silly( 'cli > build', '--file is string.' );
             logger.silly( 'cli > build', 'Attempting to build...' );
+
             if ( outFile !== undefined ) {
                 sassBuild( file, outFile );
             } else {
-                sassBuildFiles( [ file ] );
+                sassBuildFiles( [ file ], <OutputOptions> { path: outDir } );
             }
             logger.silly( 'cli > build', 'Build successful.' );
         }
