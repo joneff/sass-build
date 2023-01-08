@@ -32,10 +32,20 @@ export function cli() {
 
     const argv = argsParser( process.argv.slice(2), ARGS_PARSER_OPTIONS );
 
-    const { command, params, config } = parseArgs( argv );
+    const { error, version, commandName, params, config } = parseArgs( argv );
 
-    if ( typeof command === 'function' ) {
-        command( params );
+    if ( error ) {
+        // process.stderr.write( `${error.message}\n` );
+        exit( 1, 'error', 'cli', error.message );
+    }
+
+    if ( version ) {
+        process.stdout.write( `${VERSION}\n` );
+        process.exit(0);
+    }
+
+    if ( commandName ) {
+        commands.get( commandName )( params );
         exitSuccess();
     }
 
@@ -48,26 +58,33 @@ export function cli() {
     process.exit(0);
 }
 
-function parseArgs( argv : argsParser.Arguments ) : { command?: Function, params?: any, config?: string } {
+export function parseArgs( argv : argsParser.Arguments ) : {
+    error?: Error,
+    version?: boolean,
+    commandName?: string,
+    params?: any,
+    config?: string
+} {
 
     try {
         validateParams( argv, ARGS_PARSER_OPTIONS );
-    } catch ( err ) {
-        exit( 1, 'error', 'cli', err.message );
+    } catch ( error ) {
+        return { error };
     }
 
     const {
-        _: commandList,
+        _: _commandList,
         file, source, glob, outFile, outDir, transformer,
         config, debug, version
     } = argv;
+
+    const commandList = <string[]> _commandList || [];
     const commandName = <string> commandList[0];
     const command = commands.get( commandName );
     const params = { file, source, glob, outFile, outDir, transformer };
 
     if ( version ) {
-        process.stdout.write( `${VERSION}\n` );
-        process.exit(0);
+        return { version };
     }
 
     if ( debug ) {
@@ -75,10 +92,10 @@ function parseArgs( argv : argsParser.Arguments ) : { command?: Function, params
         logger.silly( 'cli', 'Starting in debug mode.' );
     }
 
-    if ( commandName ) {
+    if ( commandName && command ) {
         logger.silly( 'cli', 'Command is: %s', commandName );
 
-        return { command, params };
+        return { commandName, params };
     }
     logger.silly( 'cli', 'No command passed.' );
 
@@ -95,7 +112,7 @@ function parseArgs( argv : argsParser.Arguments ) : { command?: Function, params
     if ( hasParams ) {
         logger.silly( 'cli', 'Attempting build command with cli parameters' );
 
-        return { command: commands.get( 'build' ), params };
+        return { commandName: 'build', params };
     }
 
     if ( hasConfig ) {
