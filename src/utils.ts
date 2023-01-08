@@ -93,9 +93,16 @@ export const logger = new Logger();
 // #region cwd
 export const CWD = process.cwd();
 export function trimCwd(cwd: string, filePath: string) : string {
+    if ( path.isAbsolute(filePath) && !filePath.startsWith(cwd) ) {
+        return filePath;
+    }
+
     return path.relative(cwd, filePath);
 }
 export function padCwd(cwd: string, filePath: string) : string {
+    if ( path.isAbsolute(filePath) && !filePath.startsWith(cwd) ) {
+        return filePath;
+    }
     return path.resolve(cwd, filePath );
 }
 // #endregion
