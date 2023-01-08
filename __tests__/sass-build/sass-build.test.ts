@@ -1,42 +1,138 @@
 /// <reference path="../../types/index.d.ts" />
 
 import fs from 'fs';
-import path from 'path';
 import assert from 'assert';
-import { sassBuild } from '../../src/build';
-import { logger, fileExists } from '../../src/utils';
+import { describe, test, before, beforeEach, after } from 'mocha';
+import { sassBuild, sassBuildString } from '../../src/build';
+import { logger } from '../../src/utils';
 
-const FIXTURES_PATH = path.resolve( __dirname, '../__fixtures__' );
+const file = '__tests__/__fixtures__/file.scss';
+const source = fs.readFileSync( file, 'utf8' );
+const outFile = '__tests__/__fixtures__/dist/file.css';
+const distFile = 'dist/file.css';
+const outDir = '__tests__/__fixtures__/dist';
+const fileCssContent = 'body {\n    color: red;\n}\n';
+const sourceCssContent = fileCssContent;
 
-[ 'modern', 'legacy' ].forEach( apiType => {
+function cleanDist() {
+    fs.rmSync( distFile, { force: true } );
+    fs.rmSync( outDir, { recursive: true, force: true } );
+}
 
-    describe( `${apiType}-sass`, () => {
+const COMPILER_OPTIONS = <SassCompilerOptions> {};
 
-        beforeAll(() => {
-            logger.level = 'error';
+describe( 'sassBuild', () => {
+
+    before(() => {
+        logger.level = 'error';
+
+        cleanDist();
+    });
+
+    after(() => {
+        cleanDist();
+    });
+
+    beforeEach(() => {
+        Object.keys( COMPILER_OPTIONS ).forEach( key => {
+            delete COMPILER_OPTIONS[key];
         });
 
-        beforeEach(() => {
-            fs.rmSync( `${FIXTURES_PATH}/dist`, { recursive: true, force: true } );
+        cleanDist();
+    });
+
+
+    describe( 'defaults', () => {
+
+        test( 'file', () => {
+            sassBuild( file, outFile );
+            const result = fs.readFileSync( outFile, 'utf8' );
+
+            assert.ok( fs.existsSync( outFile ) );
+            assert.equal( result, fileCssContent );
         });
-        afterEach(() => {
-            fs.rmSync( `${FIXTURES_PATH}/dist`, { recursive: true, force: true } );
+
+        test( 'source', () => {
+            sassBuildString( source, outFile );
+            const result = fs.readFileSync( outFile, 'utf8' );
+
+            assert.ok( fs.existsSync( outFile ) );
+            assert.equal( result, sourceCssContent );
         });
 
-        const opts : Partial<SassCompilerOptions> = {
-            api: 'legacy'
-        };
+    });
 
-        const file = `${FIXTURES_PATH}/simple.scss`;
-        const outFile = `${FIXTURES_PATH}/dist/simple.css`;
 
-        describe( 'sassBuild', () => {
+    describe( 'node-sass', () => {
 
-            test('sassBuild compiles', () => {
-                sassBuild( file, outFile, <SassCompilerOptions> opts );
-                assert.equal( fileExists( outFile ), true );
-            });
+        test( 'file', () => {
+            COMPILER_OPTIONS.compiler = 'node-sass';
 
+            sassBuild( file, outFile, COMPILER_OPTIONS );
+            const result = fs.readFileSync( outFile, 'utf8' );
+
+            assert.ok( fs.existsSync( outFile ) );
+            assert.equal( result, fileCssContent );
+        });
+
+        test( 'source', () => {
+            COMPILER_OPTIONS.compiler = 'node-sass';
+
+            sassBuildString( source, outFile, COMPILER_OPTIONS );
+            const result = fs.readFileSync( outFile, 'utf8' );
+
+            assert.ok( fs.existsSync( outFile ) );
+            assert.equal( result, sourceCssContent );
+        });
+
+    });
+
+
+    describe( 'dart-sass', () => {
+
+        test( 'file', () => {
+            COMPILER_OPTIONS.compiler = 'sass';
+
+            sassBuild( file, outFile, COMPILER_OPTIONS );
+            const result = fs.readFileSync( outFile, 'utf8' );
+
+            assert.ok( fs.existsSync( outFile ) );
+            assert.equal( result, 'body {\n    color: red;\n}' );
+        });
+
+        test( 'source', () => {
+            COMPILER_OPTIONS.compiler = 'sass';
+
+            sassBuildString( source, outFile, COMPILER_OPTIONS );
+            const result = fs.readFileSync( outFile, 'utf8' );
+
+            assert.ok( fs.existsSync( outFile ) );
+            assert.equal( result, 'body {\n    color: red;\n}' );
+        });
+
+    });
+
+
+    describe( 'sass-embedded', () => {
+
+        test( 'file', () => {
+            COMPILER_OPTIONS.compiler = 'sass-embedded';
+
+            sassBuild( file, outFile, COMPILER_OPTIONS );
+            const result = fs.readFileSync( outFile, 'utf8' );
+
+            assert.ok( fs.existsSync( outFile ) );
+            assert.equal( result, 'body {\n  color: red;\n}' );
+        });
+
+        test( 'source', () => {
+            COMPILER_OPTIONS.compiler = 'sass-embedded';
+
+            sassBuildString( source, outFile, COMPILER_OPTIONS );
+            const result = fs.readFileSync( outFile, 'utf8' );
+
+            assert.ok( fs.existsSync( outFile ) );
+            assert.equal( result, 'body {\n  color: red;\n}' );
         });
 
     });

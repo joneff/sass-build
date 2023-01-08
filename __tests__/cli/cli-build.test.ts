@@ -1,7 +1,11 @@
 /// <reference path="../../types/index.d.ts" />
 
+import fs from 'fs';
 import assert from 'assert';
+import { execSync } from 'child_process';
+import { describe, test, before, beforeEach, after } from 'mocha';
 
+import { logger } from '../../src/utils';
 import { validateParams } from '../../src/cli/commands/build/validate-params';
 
 const PARAMS : {
@@ -13,6 +17,14 @@ const PARAMS : {
 } = {};
 const errStack : Error[] = [];
 
+const file = '__tests__/__fixtures__/file.scss';
+const source = fs.readFileSync( file, 'utf-8' ).replace( '\n', '' );
+const outFile = '__tests__/__fixtures__/dist/file.css';
+const distFile = 'dist/file.css';
+const outDir = '__tests__/__fixtures__/dist';
+const fileCssContent = 'body {\n    color: red;\n}\n';
+const sourceCssContent = fileCssContent;
+
 function _validateParams() {
     try {
         validateParams( PARAMS );
@@ -23,220 +35,295 @@ function _validateParams() {
     return errStack[0];
 }
 
+function _exec( command ) {
+    return execSync( command, { stdio: 'pipe' } );
+}
 
-describe( 'cli > build', () => {
+function cleanDist() {
+    fs.rmSync( distFile, { force: true } );
+    fs.rmSync( outDir, { recursive: true, force: true } );
+}
 
-    describe( 'validate params', () => {
 
-        beforeEach( () => {
-            errStack.length = 0;
+describe( 'cli', () => {
 
-            Object.keys( PARAMS ).forEach( key => {
-                delete PARAMS[key];
+    before(() => {
+        logger.level = 'error';
+
+        cleanDist();
+    });
+
+    after(() => {
+        cleanDist();
+    });
+
+    beforeEach( () => {
+        logger.level = 'error';
+
+        cleanDist();
+    });
+
+    describe( '!build', () => {
+
+        describe( 'run', () => {
+
+            test( 'sass-build --file', () => {
+                _exec( `node ./bin/sass-build.js --file ${file}` );
+
+                assert.ok( fs.existsSync( distFile ) );
+                assert.equal( fs.readFileSync( distFile, 'utf8' ), fileCssContent );
             });
+
+            test( 'sass-build --file --outFile', () => {
+                _exec( `node ./bin/sass-build.js --file ${file} --outFile ${outFile}` );
+
+                assert.ok( fs.existsSync( outFile ) );
+                assert.equal( fs.readFileSync( outFile, 'utf8' ), fileCssContent );
+            });
+
+            test( 'sass-build --file --outDir', () => {
+                _exec( `node ./bin/sass-build.js --file ${file} --outDir ${outDir}` );
+
+                assert.ok( fs.existsSync( outFile ) );
+                assert.equal( fs.readFileSync( outFile, 'utf8' ), fileCssContent );
+            });
+
+            test( 'sass-build --file --file', () => {
+                _exec( `node ./bin/sass-build.js --file ${file} --file ${file}` );
+
+                assert.ok( fs.existsSync( distFile ) );
+                assert.equal( fs.readFileSync( distFile, 'utf8' ), fileCssContent );
+            });
+
+            test( 'sass-build --file --file --outDir', () => {
+                _exec( `node ./bin/sass-build.js --file ${file} --file ${file} --outDir ${outDir}` );
+
+                assert.ok( fs.existsSync( outFile ) );
+                assert.equal( fs.readFileSync( outFile, 'utf8' ), fileCssContent );
+            });
+
+            test( 'sass-build --source --outFile', () => {
+                _exec( `node ./bin/sass-build.js --source '${source}' --outFile ${outFile}` );
+
+                assert.ok( fs.existsSync( outFile ) );
+                assert.equal( fs.readFileSync( outFile, 'utf8' ), sourceCssContent );
+            });
+
+            test( 'sass-build build --file', () => {
+                _exec( `node ./bin/sass-build.js build --file ${file}` );
+
+                assert.ok( fs.existsSync( distFile ) );
+                assert.equal( fs.readFileSync( distFile, 'utf8' ), fileCssContent );
+            });
+
+            test( 'sass-build build --file --outFile', () => {
+                _exec( `node ./bin/sass-build.js build --file ${file} --outFile ${outFile}` );
+
+                assert.ok( fs.existsSync( outFile ) );
+                assert.equal( fs.readFileSync( outFile, 'utf8' ), fileCssContent );
+            });
+
+            test( 'sass-build build --file --outDir', () => {
+                _exec( `node ./bin/sass-build.js build --file ${file} --outDir ${outDir}` );
+
+                assert.ok( fs.existsSync( outFile ) );
+                assert.equal( fs.readFileSync( outFile, 'utf8' ), fileCssContent );
+            });
+
+            test( 'sass-build build --file --file', () => {
+                _exec( `node ./bin/sass-build.js build --file ${file} --file ${file}` );
+
+                assert.ok( fs.existsSync( distFile ) );
+                assert.equal( fs.readFileSync( distFile, 'utf8' ), fileCssContent );
+            });
+
+            test( 'sass-build build --file --file --outDir', () => {
+                _exec( `node ./bin/sass-build.js build --file ${file} --file ${file} --outDir ${outDir}` );
+
+                assert.ok( fs.existsSync( outFile ) );
+                assert.equal( fs.readFileSync( outFile, 'utf8' ), fileCssContent );
+            });
+
+            test( 'sass-build build --source --outFile', () => {
+                _exec( `node ./bin/sass-build.js build --source '${source}' --outFile ${outFile}` );
+
+                assert.ok( fs.existsSync( outFile ) );
+                assert.equal( fs.readFileSync( outFile, 'utf8' ), sourceCssContent );
+            });
+
         });
 
 
-        // Correct usage
-        test( '--file', () => {
-            PARAMS.file = 'foo';
+        describe( 'validate params', () => {
 
-            const error = _validateParams();
+            beforeEach( () => {
+                errStack.length = 0;
 
-            assert.strictEqual( errStack.length, 0 );
-            assert.strictEqual( error, undefined );
-        });
+                Object.keys( PARAMS ).forEach( key => {
+                    delete PARAMS[key];
+                });
+            });
 
-        test( '--file array', () => {
-            PARAMS.file = [ 'foo', 'bar' ];
+            describe( 'correct usage', () => {
 
-            const error = _validateParams();
+                test( '--file', () => {
+                    PARAMS.file = 'foo';
 
-            assert.strictEqual( errStack.length, 0 );
-            assert.strictEqual( error, undefined );
-        });
+                    const error = _validateParams();
 
-        test( '--file --outFile', () => {
-            PARAMS.file = 'foo';
-            PARAMS.outFile = 'bar';
+                    assert.strictEqual( errStack.length, 0 );
+                    assert.strictEqual( error, undefined );
+                });
 
-            const error = _validateParams();
+                test( '--file array', () => {
+                    PARAMS.file = [ 'foo', 'bar' ];
 
-            assert.strictEqual( errStack.length, 0 );
-            assert.strictEqual( error, undefined );
-        });
+                    const error = _validateParams();
 
-        test( '--file --outDir', () => {
-            PARAMS.file = 'foo';
-            PARAMS.outDir = 'bar';
+                    assert.strictEqual( errStack.length, 0 );
+                    assert.strictEqual( error, undefined );
+                });
 
-            const error = _validateParams();
+                test( '--file --outFile', () => {
+                    PARAMS.file = 'foo';
+                    PARAMS.outFile = 'bar';
 
-            assert.strictEqual( errStack.length, 0 );
-            assert.strictEqual( error, undefined );
-        });
+                    const error = _validateParams();
 
-        test( '--file array --outDir', () => {
-            PARAMS.file = [ 'foo', 'bar' ];
-            PARAMS.outDir = 'baz';
+                    assert.strictEqual( errStack.length, 0 );
+                    assert.strictEqual( error, undefined );
+                });
 
-            const error = _validateParams();
+                test( '--file --outDir', () => {
+                    PARAMS.file = 'foo';
+                    PARAMS.outDir = 'bar';
 
-            assert.strictEqual( errStack.length, 0 );
-            assert.strictEqual( error, undefined );
-        });
+                    const error = _validateParams();
 
-        test( '--source --outFile', () => {
-            PARAMS.source = 'foo';
-            PARAMS.outFile = 'bar';
+                    assert.strictEqual( errStack.length, 0 );
+                    assert.strictEqual( error, undefined );
+                });
 
-            const error = _validateParams();
+                test( '--file array --outDir', () => {
+                    PARAMS.file = [ 'foo', 'bar' ];
+                    PARAMS.outDir = 'baz';
 
-            assert.strictEqual( errStack.length, 0 );
-            assert.strictEqual( error, undefined );
-        });
+                    const error = _validateParams();
 
-        test( '--glob', () => {
-            PARAMS.glob = 'foo';
+                    assert.strictEqual( errStack.length, 0 );
+                    assert.strictEqual( error, undefined );
+                });
 
-            const error = _validateParams();
+                test( '--source --outFile', () => {
+                    PARAMS.source = 'foo';
+                    PARAMS.outFile = 'bar';
 
-            assert.strictEqual( errStack.length, 0 );
-            assert.strictEqual( error, undefined );
-        });
+                    const error = _validateParams();
 
-        test( '--glob array', () => {
-            PARAMS.glob = [ 'foo', 'bar' ];
+                    assert.strictEqual( errStack.length, 0 );
+                    assert.strictEqual( error, undefined );
+                });
 
-            const error = _validateParams();
+                test( '--glob', () => {
+                    PARAMS.glob = 'foo';
 
-            assert.strictEqual( errStack.length, 0 );
-            assert.strictEqual( error, undefined );
-        });
+                    const error = _validateParams();
 
-        test( '--glob --outDir', () => {
-            PARAMS.glob = 'foo';
-            PARAMS.outDir = 'bar';
+                    assert.strictEqual( errStack.length, 0 );
+                    assert.strictEqual( error, undefined );
+                });
 
-            const error = _validateParams();
+                test( '--glob array', () => {
+                    PARAMS.glob = [ 'foo', 'bar' ];
 
-            assert.strictEqual( errStack.length, 0 );
-            assert.strictEqual( error, undefined );
-        });
+                    const error = _validateParams();
+
+                    assert.strictEqual( errStack.length, 0 );
+                    assert.strictEqual( error, undefined );
+                });
+
+                test( '--glob --outDir', () => {
+                    PARAMS.glob = 'foo';
+                    PARAMS.outDir = 'bar';
+
+                    const error = _validateParams();
+
+                    assert.strictEqual( errStack.length, 0 );
+                    assert.strictEqual( error, undefined );
+                });
+
+            });
 
 
-        // Incorrect usage
-        test( 'no --file, --source or --glob', () => {
-            PARAMS.file = undefined;
-            PARAMS.source = undefined;
-            PARAMS.glob = undefined;
+            describe( 'incorrect usage', () => {
 
-            const error = _validateParams();
+                test( 'no params', () => {
+                    PARAMS.file = undefined;
+                    PARAMS.source = undefined;
+                    PARAMS.glob = undefined;
 
-            assert.strictEqual( errStack.length, 1 );
-            assert.strictEqual(
-                error.message,
-                'Supply either --file, --source or --glob.'
-            );
-        });
+                    const error = _validateParams();
 
-        test( '--file empty string', () => {
-            PARAMS.file = '';
+                    assert.strictEqual( errStack.length, 1 );
+                    assert.strictEqual(
+                        error.message,
+                        'Supply either --file, --source or --glob.'
+                    );
+                });
 
-            const error = _validateParams();
+                test( '--file array --outFile', () => {
+                    PARAMS.file = [ 'foo', 'bar' ];
+                    PARAMS.outFile = 'baz';
 
-            assert.strictEqual( errStack.length, 1 );
-            assert.strictEqual(
-                error.message,
-                '--file must not be empty.'
-            );
-        });
+                    const error = _validateParams();
 
-        test( '--file empty array', () => {
-            PARAMS.file = [];
+                    assert.strictEqual( errStack.length, 1 );
+                    assert.strictEqual(
+                        error.message,
+                        'Supply --outDir instead of --outFile.'
+                    );
+                });
 
-            const error = _validateParams();
+                test( '--source', () => {
+                    PARAMS.source = 'foo';
 
-            assert.strictEqual( errStack.length, 1 );
-            assert.strictEqual(
-                error.message,
-                '--file must not be empty.'
-            );
-        });
+                    const error = _validateParams();
 
-        test( '--file array --outFile', () => {
-            PARAMS.file = [ 'foo', 'bar' ];
-            PARAMS.outFile = 'baz';
+                    assert.strictEqual( errStack.length, 1 );
+                    assert.strictEqual(
+                        error.message,
+                        'Supply --outFile.'
+                    );
+                });
 
-            const error = _validateParams();
+                test( '--glob --outFile', () => {
+                    PARAMS.glob = 'foo';
+                    PARAMS.outFile = 'bar';
 
-            assert.strictEqual( errStack.length, 1 );
-            assert.strictEqual(
-                error.message,
-                'Supply --outDir instead of --outFile.'
-            );
-        });
+                    const error = _validateParams();
 
-        test( '--source', () => {
-            PARAMS.source = 'foo';
+                    assert.strictEqual( errStack.length, 1 );
+                    assert.strictEqual(
+                        error.message,
+                        'Supply --outDir instead of --outFile.'
+                    );
+                });
 
-            const error = _validateParams();
+                test( '--glob array --outFile', () => {
+                    PARAMS.glob = [ 'foo', 'bar' ];
+                    PARAMS.outFile = 'baz';
 
-            assert.strictEqual( errStack.length, 1 );
-            assert.strictEqual(
-                error.message,
-                'Supply --outFile.'
-            );
-        });
+                    const error = _validateParams();
 
-        test( '--glob empty string', () => {
-            PARAMS.glob = '';
+                    assert.strictEqual( errStack.length, 1 );
+                    assert.strictEqual(
+                        error.message,
+                        'Supply --outDir instead of --outFile.'
+                    );
+                });
 
-            const error = _validateParams();
+            });
 
-            assert.strictEqual( errStack.length, 1 );
-            assert.strictEqual(
-                error.message,
-                '--glob must not be empty.'
-            );
-        });
-
-        test( '--glob empty array', () => {
-            PARAMS.glob = [];
-
-            const error = _validateParams();
-
-            assert.strictEqual( errStack.length, 1 );
-            assert.strictEqual(
-                error.message,
-                '--glob must not be empty.'
-            );
-        });
-
-        test( '--glob --outFile', () => {
-            PARAMS.glob = 'foo';
-            PARAMS.outFile = 'bar';
-
-            const error = _validateParams();
-
-            assert.strictEqual( errStack.length, 1 );
-            assert.strictEqual(
-                error.message,
-                'Supply --outDir instead of --outFile.'
-            );
-        });
-
-        test( '--glob array --outFile', () => {
-            PARAMS.glob = [ 'foo', 'bar' ];
-            PARAMS.outFile = 'baz';
-
-            const error = _validateParams();
-
-            assert.strictEqual( errStack.length, 1 );
-            assert.strictEqual(
-                error.message,
-                'Supply --outDir instead of --outFile.'
-            );
         });
 
     });

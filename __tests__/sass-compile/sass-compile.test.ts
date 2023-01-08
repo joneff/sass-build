@@ -2,63 +2,280 @@
 
 import path from 'path';
 import assert from 'assert';
+import { describe, test, before, beforeEach } from 'mocha';
 import { sassCompile } from '../../src/compile';
 import { logger } from '../../src/utils';
 
 const FIXTURES_PATH = path.resolve( __dirname, '../__fixtures__' );
+const file = `${FIXTURES_PATH}/file.scss`;
+const importFile = `${FIXTURES_PATH}/import-file.scss`;
+const useFile = `${FIXTURES_PATH}/use-file.scss`;
+const importNested = `${FIXTURES_PATH}/import-nested.scss`;
+const useNested = `${FIXTURES_PATH}/use-nested.scss`;
 
-[ 'modern', 'legacy' ].forEach( apiType => {
+const compilerOptions = <SassCompilerOptions> {};
+const sassOptions = <SassOptions> {};
 
-    describe( `${apiType}-sass`, () => {
 
-        beforeAll(() => {
-            logger.level = 'error';
-        });
+describe( 'node-sass', () => {
 
-        const opts : Partial<SassCompilerOptions> = {
-            api: 'legacy'
-        };
+    before(() => {
+        logger.level = 'error';
+    });
 
-        const file = `${FIXTURES_PATH}/simple.scss`;
-        const nestedFile = `${FIXTURES_PATH}/nested/at-import.scss`;
+    beforeEach(() => {
+        Object.keys( compilerOptions ).forEach( key => delete compilerOptions[key] );
+        Object.keys( sassOptions ).forEach( key => delete sassOptions[key] );
 
-        describe( 'sassCompile', () => {
+        compilerOptions.compiler = 'node-sass';
+        compilerOptions.api = 'legacy';
+        compilerOptions.sassOptions = sassOptions;
+    });
 
-            test('sassCompile compiles', () => {
-                const fileContent = sassCompile( file, <SassCompilerOptions> opts );
-                assert.notEqual( fileContent, '' );
-            });
 
-        });
+    test( 'compiles', () => {
+        const fileContent = sassCompile( file, compilerOptions );
+        assert.notEqual( fileContent, '' );
+    });
 
-        describe('sassCompile w/ minify', () => {
 
-            test('minify: true', () => {
-                const sassOptions : Partial<SassOptions> = { minify: true };
-                const fileContent = sassCompile( file, <SassCompilerOptions> { ...opts, sassOptions } );
+    test( 'import file', () => {
+        const fileContent = sassCompile( importFile, compilerOptions );
+        assert.equal( fileContent, 'body {\n    color: red;\n}\n' );
+    });
 
-                assert.equal( fileContent, 'body{color:red}\n' );
-            });
-            test('minify: false', () => {
-                const sassOptions : Partial<SassOptions> = { minify: false };
-                const fileContent = sassCompile( file, <SassCompilerOptions> { ...opts, sassOptions } );
+    test( 'import nested', () => {
+        const fileContent = sassCompile( importNested, compilerOptions );
+        assert.equal( fileContent, 'body {\n    color: blue;\n}\n' );
+    });
 
-                assert.equal( fileContent, 'body {\n    color: red;\n}\n' );
-            });
 
-        });
+    test( 'minify: true', () => {
+        sassOptions.minify = true;
+        const fileContent = sassCompile( file, compilerOptions );
 
-        describe('sassCompile w/ loadPaths', () => {
+        assert.equal( fileContent, 'body{color:red}\n' );
+    });
 
-            test('correct path', () => {
-                const sassOptions : Partial<SassOptions> = { loadPaths: [ FIXTURES_PATH ] };
-                const fileContent = sassCompile( nestedFile, <SassCompilerOptions> { ...opts, sassOptions } );
+    test( 'minify: false', () => {
+        sassOptions.minify = false;
+        const fileContent = sassCompile( file, compilerOptions );
 
-                assert.notEqual( fileContent, '' );
-            });
+        assert.equal( fileContent, 'body {\n    color: red;\n}\n' );
+    });
 
-        });
+});
 
+
+describe( 'dart-sass', () => {
+
+    before(() => {
+        logger.level = 'error';
+    });
+
+    beforeEach(() => {
+        Object.keys( compilerOptions ).forEach( key => delete compilerOptions[key] );
+        Object.keys( sassOptions ).forEach( key => delete sassOptions[key] );
+
+        compilerOptions.compiler = 'sass';
+        compilerOptions.api = 'legacy';
+        compilerOptions.sassOptions = sassOptions;
+    });
+
+
+    test( 'compiles', () => {
+        const fileContent = sassCompile( file, compilerOptions );
+        assert.notEqual( fileContent, '' );
+    });
+
+    test( 'compiles modern', () => {
+        compilerOptions.api = 'modern';
+        const fileContent = sassCompile( file, compilerOptions );
+        assert.notEqual( fileContent, '' );
+    });
+
+
+    test( 'import file', () => {
+        const fileContent = sassCompile( importFile, compilerOptions );
+        assert.equal( fileContent, 'body {\n    color: red;\n}' );
+    });
+
+    test( 'import file modern', () => {
+        compilerOptions.api = 'modern';
+        const fileContent = sassCompile( importFile, compilerOptions );
+        assert.equal( fileContent, 'body {\n  color: red;\n}' );
+    });
+
+    test( 'import nested', () => {
+        const fileContent = sassCompile( importNested, compilerOptions );
+        assert.equal( fileContent, 'body {\n    color: blue;\n}' );
+    });
+
+    test( 'import nested modern', () => {
+        compilerOptions.api = 'modern';
+        const fileContent = sassCompile( importNested, compilerOptions );
+        assert.equal( fileContent, 'body {\n  color: blue;\n}' );
+    });
+
+
+    test( 'use file', () => {
+        const fileContent = sassCompile( useFile, compilerOptions );
+        assert.equal( fileContent, 'body {\n    color: red;\n}' );
+    });
+
+    test( 'use file modern', () => {
+        compilerOptions.api = 'modern';
+        const fileContent = sassCompile( useFile, compilerOptions );
+        assert.equal( fileContent, 'body {\n  color: red;\n}' );
+    });
+
+    test( 'use nested', () => {
+        const fileContent = sassCompile( useNested, compilerOptions );
+        assert.equal( fileContent, 'body {\n    color: blue;\n}' );
+    });
+
+    test( 'use nested modern', () => {
+        compilerOptions.api = 'modern';
+        const fileContent = sassCompile( useNested, compilerOptions );
+        assert.equal( fileContent, 'body {\n  color: blue;\n}' );
+    });
+
+
+    test( 'minify: true', () => {
+        sassOptions.minify = true;
+        const fileContent = sassCompile( file, compilerOptions );
+
+        assert.equal( fileContent, 'body{color:red}' );
+    });
+
+    test( 'minify: true modern', () => {
+        compilerOptions.api = 'modern';
+        sassOptions.minify = true;
+        const fileContent = sassCompile( file, compilerOptions );
+
+        assert.equal( fileContent, 'body{color:red}' );
+    });
+
+    test( 'minify: false', () => {
+        sassOptions.minify = false;
+        const fileContent = sassCompile( file, compilerOptions );
+
+        assert.equal( fileContent, 'body {\n    color: red;\n}' );
+    });
+
+    test( 'minify: false modern', () => {
+        compilerOptions.api = 'modern';
+        sassOptions.minify = false;
+        const fileContent = sassCompile( file, compilerOptions );
+
+        assert.equal( fileContent, 'body {\n  color: red;\n}' );
+    });
+
+});
+
+
+describe( 'sass-embedded', () => {
+
+    before(() => {
+        logger.level = 'error';
+    });
+
+    beforeEach(() => {
+        Object.keys( compilerOptions ).forEach( key => delete compilerOptions[key] );
+        Object.keys( sassOptions ).forEach( key => delete sassOptions[key] );
+
+        compilerOptions.compiler = 'sass-embedded';
+        compilerOptions.api = 'legacy';
+        compilerOptions.sassOptions = sassOptions;
+    });
+
+
+    test( 'compiles', () => {
+        const fileContent = sassCompile( file, compilerOptions );
+        assert.notEqual( fileContent, '' );
+    });
+
+    test( 'compiles modern', () => {
+        compilerOptions.api = 'modern';
+        const fileContent = sassCompile( file, compilerOptions );
+        assert.notEqual( fileContent, '' );
+    });
+
+
+    test( 'import file', () => {
+        const fileContent = sassCompile( importFile, compilerOptions );
+        assert.equal( fileContent, 'body {\n  color: red;\n}' );
+    });
+
+    test( 'import file modern', () => {
+        compilerOptions.api = 'modern';
+        const fileContent = sassCompile( importFile, compilerOptions );
+        assert.equal( fileContent, 'body {\n  color: red;\n}' );
+    });
+
+    test( 'import nested', () => {
+        const fileContent = sassCompile( importNested, compilerOptions );
+        assert.equal( fileContent, 'body {\n  color: blue;\n}' );
+    });
+
+    test( 'import nested modern', () => {
+        compilerOptions.api = 'modern';
+        const fileContent = sassCompile( importNested, compilerOptions );
+        assert.equal( fileContent, 'body {\n  color: blue;\n}' );
+    });
+
+
+    test( 'use file', () => {
+        const fileContent = sassCompile( useFile, compilerOptions );
+        assert.equal( fileContent, 'body {\n  color: red;\n}' );
+    });
+
+    test( 'use file modern', () => {
+        compilerOptions.api = 'modern';
+        const fileContent = sassCompile( useFile, compilerOptions );
+        assert.equal( fileContent, 'body {\n  color: red;\n}' );
+    });
+
+    test( 'use nested', () => {
+        const fileContent = sassCompile( useNested, compilerOptions );
+        assert.equal( fileContent, 'body {\n  color: blue;\n}' );
+    });
+
+    test( 'use nested modern', () => {
+        compilerOptions.api = 'modern';
+        const fileContent = sassCompile( useNested, compilerOptions );
+        assert.equal( fileContent, 'body {\n  color: blue;\n}' );
+    });
+
+
+    test( 'minify: true', () => {
+        sassOptions.minify = true;
+        const fileContent = sassCompile( file, compilerOptions );
+
+        assert.equal( fileContent, 'body{color:red}' );
+    });
+
+    test( 'minify: true modern', () => {
+        compilerOptions.api = 'modern';
+        sassOptions.minify = true;
+        const fileContent = sassCompile( file, compilerOptions );
+
+        assert.equal( fileContent, 'body{color:red}' );
+    });
+
+    test( 'minify: false', () => {
+        sassOptions.minify = false;
+        const fileContent = sassCompile( file, compilerOptions );
+
+        assert.equal( fileContent, 'body {\n  color: red;\n}' );
+    });
+
+    test( 'minify: false modern', () => {
+        compilerOptions.api = 'modern';
+        sassOptions.minify = false;
+        const fileContent = sassCompile( file, compilerOptions );
+
+        assert.equal( fileContent, 'body {\n  color: red;\n}' );
     });
 
 });
