@@ -30,7 +30,7 @@
     "build": "node scripts/build.js",
     "watch": "npm run build -- --watch",
     "eslint": "eslint \"**/*.{js,jsx,ts,tsx}\"",
-    "test": "jest",
+    "test": "ts-mocha",
     "check-types": "npx tsc --project tsconfig.json",
     "update": "npx npm-check-updates --upgrade",
     "prepublishOnly": "npm run build"
@@ -56,7 +56,6 @@
     "@semantic-release/changelog": "^6.0.1",
     "@semantic-release/git": "^10.0.1",
     "@types/glob": "^8.0.0",
-    "@types/jest": "^29.2.3",
     "@types/lodash": "^4.14.190",
     "@types/mime-types": "^2.1.1",
     "@types/npmlog": "^4.1.4",
@@ -66,9 +65,9 @@
     "esbuild": "^0.15.16",
     "eslint": "^8.28.0",
     "husky": "^8.0.2",
-    "jest": "^29.3.1",
+    "mocha": "^10.2.0",
     "semantic-release": "^19.0.5",
-    "ts-jest": "^29.0.3",
+    "ts-mocha": "^10.0.0",
     "typescript": "^4.7.4"
   }
 }

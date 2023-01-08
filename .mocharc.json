@@ -1,0 +1,5 @@
+{
+    "watch": false,
+    "spec": "__tests__/**/*.test.ts",
+    "reporter": "spec"
+}
