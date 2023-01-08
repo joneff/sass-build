@@ -1,6 +1,9 @@
 /// <reference path="../../types/index.d.ts" />
 
+import fs from 'fs';
 import assert from 'assert';
+import { execSync } from 'child_process';
+import { describe, test, beforeEach } from 'mocha';
 
 import { validateParams } from '../../src/cli/commands/compile/validate-params';
 
@@ -13,6 +16,11 @@ const PARAMS : {
 } = {};
 const errStack : Error[] = [];
 
+const file = '__tests__/__fixtures__/file.scss';
+const source = fs.readFileSync( file, 'utf8' ).replace( '\n', '');
+const fileCssContent = 'body {\n    color: red;\n}';
+const sourceCssContent = fileCssContent;
+
 function _validateParams() {
     try {
         validateParams( PARAMS );
@@ -23,128 +31,155 @@ function _validateParams() {
     return errStack[0];
 }
 
+function _exec( command ) {
+    return execSync( command, { stdio: 'pipe' } );
+}
 
-describe( 'cli > build', () => {
 
-    describe( 'validate params', () => {
+describe( 'cli', () => {
 
-        beforeEach( () => {
-            errStack.length = 0;
+    describe( '!compile', () => {
 
-            Object.keys( PARAMS ).forEach( key => {
-                delete PARAMS[key];
+        describe( 'run', () => {
+
+            test( 'sass-build compile --file', () => {
+                const rawResult = _exec( `node ./bin/sass-build.js compile --file ${file}` );
+                const result = rawResult.toString().trim();
+
+                assert.equal( result, fileCssContent );
             });
+
+            test( 'sass-build compile --source', () => {
+                const rawResult = _exec( `node ./bin/sass-build.js compile --source '${source}'` );
+                const result = rawResult.toString().trim();
+
+                assert.equal( result, sourceCssContent );
+            });
+
         });
 
 
-        // Correct usage
-        test( '--file', () => {
-            PARAMS.file = 'foo';
+        describe( 'validate params', () => {
 
-            const error = _validateParams();
+            beforeEach( () => {
+                errStack.length = 0;
 
-            assert.strictEqual( errStack.length, 0 );
-            assert.strictEqual( error, undefined );
-        });
-
-        test( '--source', () => {
-            PARAMS.source = 'foo';
-
-            const error = _validateParams();
-
-            assert.strictEqual( errStack.length, 0 );
-            assert.strictEqual( error, undefined );
-        });
+                Object.keys( PARAMS ).forEach( key => {
+                    delete PARAMS[key];
+                });
+            });
 
 
-        // Incorrect usage
-        test( 'no --file or --source', () => {
-            PARAMS.file = undefined;
-            PARAMS.source = undefined;
+            // Correct usage
+            test( '--file', () => {
+                PARAMS.file = 'foo';
 
-            const error = _validateParams();
+                const error = _validateParams();
 
-            assert.strictEqual( errStack.length, 1 );
-            assert.strictEqual(
-                error.message,
-                'Supply either --file or --source.'
-            );
-        });
+                assert.strictEqual( errStack.length, 0 );
+                assert.strictEqual( error, undefined );
+            });
 
-        test( '--file array', () => {
-            PARAMS.file = [ 'foo', 'bar' ];
+            test( '--source', () => {
+                PARAMS.source = 'foo';
 
-            const error = _validateParams();
+                const error = _validateParams();
 
-            assert.strictEqual( errStack.length, 1 );
-            assert.strictEqual(
-                error.message,
-                '--file must be string.'
-            );
-        });
+                assert.strictEqual( errStack.length, 0 );
+                assert.strictEqual( error, undefined );
+            });
 
-        test( '--file --outFile', () => {
-            PARAMS.file = 'foo';
-            PARAMS.outFile = 'bar';
 
-            const error = _validateParams();
+            // Incorrect usage
+            test( 'no --file or --source', () => {
+                PARAMS.file = undefined;
+                PARAMS.source = undefined;
 
-            assert.strictEqual( errStack.length, 1 );
-            assert.strictEqual(
-                error.message,
-                'Do not supply --outFile or --outDir.'
-            );
-        });
+                const error = _validateParams();
 
-        test( '--file --outDir', () => {
-            PARAMS.file = 'foo';
-            PARAMS.outDir = 'bar';
+                assert.strictEqual( errStack.length, 1 );
+                assert.strictEqual(
+                    error.message,
+                    'Supply either --file or --source.'
+                );
+            });
 
-            const error = _validateParams();
+            test( '--file array', () => {
+                PARAMS.file = [ 'foo', 'bar' ];
 
-            assert.strictEqual( errStack.length, 1 );
-            assert.strictEqual(
-                error.message,
-                'Do not supply --outFile or --outDir.'
-            );
-        });
+                const error = _validateParams();
 
-        test( '--source array', () => {
-            PARAMS.source = [ 'foo', 'bar' ];
+                assert.strictEqual( errStack.length, 1 );
+                assert.strictEqual(
+                    error.message,
+                    '--file must be string.'
+                );
+            });
 
-            const error = _validateParams();
+            test( '--file --outFile', () => {
+                PARAMS.file = 'foo';
+                PARAMS.outFile = 'bar';
 
-            assert.strictEqual( errStack.length, 1 );
-            assert.strictEqual(
-                error.message,
-                '--source must be string.'
-            );
-        });
+                const error = _validateParams();
 
-        test( '--source --outFile', () => {
-            PARAMS.source = 'foo';
-            PARAMS.outFile = 'bar';
+                assert.strictEqual( errStack.length, 1 );
+                assert.strictEqual(
+                    error.message,
+                    'Do not supply --outFile or --outDir.'
+                );
+            });
 
-            const error = _validateParams();
+            test( '--file --outDir', () => {
+                PARAMS.file = 'foo';
+                PARAMS.outDir = 'bar';
 
-            assert.strictEqual( errStack.length, 1 );
-            assert.strictEqual(
-                error.message,
-                'Do not supply --outFile or --outDir.'
-            );
-        });
+                const error = _validateParams();
 
-        test( '--source --outDir', () => {
-            PARAMS.source = 'foo';
-            PARAMS.outDir = 'bar';
+                assert.strictEqual( errStack.length, 1 );
+                assert.strictEqual(
+                    error.message,
+                    'Do not supply --outFile or --outDir.'
+                );
+            });
 
-            const error = _validateParams();
+            test( '--source array', () => {
+                PARAMS.source = [ 'foo', 'bar' ];
 
-            assert.strictEqual( errStack.length, 1 );
-            assert.strictEqual(
-                error.message,
-                'Do not supply --outFile or --outDir.'
-            );
+                const error = _validateParams();
+
+                assert.strictEqual( errStack.length, 1 );
+                assert.strictEqual(
+                    error.message,
+                    '--source must be string.'
+                );
+            });
+
+            test( '--source --outFile', () => {
+                PARAMS.source = 'foo';
+                PARAMS.outFile = 'bar';
+
+                const error = _validateParams();
+
+                assert.strictEqual( errStack.length, 1 );
+                assert.strictEqual(
+                    error.message,
+                    'Do not supply --outFile or --outDir.'
+                );
+            });
+
+            test( '--source --outDir', () => {
+                PARAMS.source = 'foo';
+                PARAMS.outDir = 'bar';
+
+                const error = _validateParams();
+
+                assert.strictEqual( errStack.length, 1 );
+                assert.strictEqual(
+                    error.message,
+                    'Do not supply --outFile or --outDir.'
+                );
+            });
+
         });
 
     });

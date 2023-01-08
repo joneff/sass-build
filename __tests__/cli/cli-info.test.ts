@@ -2,6 +2,7 @@
 
 import assert from 'assert';
 import { execSync } from 'child_process';
+import { describe, test, beforeEach } from 'mocha';
 
 import { validateParams } from '../../src/cli/commands/info/validate-params';
 
@@ -37,76 +38,94 @@ function _validateParams() {
     return errStack[0];
 }
 
-
-describe( 'cli > info', () => {
-
-    test( 'sass-build info', () => {
-        const rawResult = execSync( 'node ./bin/sass-build.js info' );
-        const result = rawResult.toString().trim();
-
-        assert.strictEqual( result, INFO );
-    });
+function _exec( command ) {
+    return execSync( command, { stdio: 'pipe' } );
+}
 
 
-    describe( 'validate params', () => {
+describe( 'cli', () => {
 
-        beforeEach( () => {
-            errStack.length = 0;
+    describe( '!info', () => {
 
-            Object.keys( PARAMS ).forEach( key => {
-                delete PARAMS[key];
+        describe( 'run', () => {
+
+            test( 'sass-build info', () => {
+                const rawResult = _exec( 'node ./bin/sass-build.js info' );
+                const result = rawResult.toString().trim();
+                assert.strictEqual( result, INFO );
             });
-        });
 
-        // Correct usage
-        test( 'no additional parameters passed', () => {
-            const error = _validateParams();
-
-            assert.strictEqual( errStack.length, 0 );
-            assert.strictEqual( error, undefined );
-        });
-
-        test( 'undefined parameters passed', () => {
-            PARAMS.file = undefined;
-            PARAMS.source = undefined;
-            PARAMS.glob = undefined;
-            PARAMS.outFile = undefined;
-            PARAMS.outDir = undefined;
-
-            const error = _validateParams();
-
-            assert.strictEqual( errStack.length, 0 );
-            assert.strictEqual( error, undefined );
         });
 
 
-        // Incorrect usage
-        test( 'empty parameters passed', () => {
-            PARAMS.file = '';
-            PARAMS.source = '';
-            PARAMS.glob = '';
-            PARAMS.outFile = '';
-            PARAMS.outDir = '';
+        describe( 'validate params', () => {
 
-            const error = _validateParams();
+            beforeEach( () => {
+                errStack.length = 0;
 
-            assert.strictEqual( errStack.length, 1 );
-            assert.strictEqual(
-                error.message,
-                'Command "info" does not accept additional parameters.'
-            );
-        });
+                Object.keys( PARAMS ).forEach( key => {
+                    delete PARAMS[key];
+                });
+            });
 
-        test( 'any parameters passed', () => {
-            PARAMS.file = 'foo';
 
-            const error = _validateParams();
+            describe( 'correct usage', () => {
 
-            assert.strictEqual( errStack.length, 1 );
-            assert.strictEqual(
-                error.message,
-                'Command "info" does not accept additional parameters.'
-            );
+                test( 'no params', () => {
+                    const error = _validateParams();
+
+                    assert.strictEqual( errStack.length, 0 );
+                    assert.strictEqual( error, undefined );
+                });
+
+                test( 'undefined params', () => {
+                    PARAMS.file = undefined;
+                    PARAMS.source = undefined;
+                    PARAMS.glob = undefined;
+                    PARAMS.outFile = undefined;
+                    PARAMS.outDir = undefined;
+
+                    const error = _validateParams();
+
+                    assert.strictEqual( errStack.length, 0 );
+                    assert.strictEqual( error, undefined );
+                });
+
+            });
+
+
+            describe( 'incorrect usage', () => {
+
+                test( 'empty params', () => {
+                    PARAMS.file = '';
+                    PARAMS.source = '';
+                    PARAMS.glob = '';
+                    PARAMS.outFile = '';
+                    PARAMS.outDir = '';
+
+                    const error = _validateParams();
+
+                    assert.strictEqual( errStack.length, 1 );
+                    assert.strictEqual(
+                        error.message,
+                        'Command "info" does not accept additional parameters.'
+                    );
+                });
+
+                test( 'any params', () => {
+                    PARAMS.file = 'foo';
+
+                    const error = _validateParams();
+
+                    assert.strictEqual( errStack.length, 1 );
+                    assert.strictEqual(
+                        error.message,
+                        'Command "info" does not accept additional parameters.'
+                    );
+                });
+
+            });
+
         });
 
     });

@@ -1,6 +1,7 @@
 /// <reference path="../../types/index.d.ts" />
 
 import assert from 'assert';
+import { describe, test } from 'mocha';
 import { wrapCompiler } from '../../src';
 
 describe( 'sass-compiler', () => {
