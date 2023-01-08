@@ -115,4 +115,5 @@ export function validateParams( argv: argsParser.Arguments, argsParserOpts: args
     if ( outFile !== undefined && outDir !== undefined ) {
         throw new Error( '--outFile and --outDir parameters cannot be used together.' );
     }
+
 }

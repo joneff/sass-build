@@ -2,12 +2,14 @@ import { cliBuild } from './build';
 import { cliCompile } from './compile';
 import { cliInfo } from './info';
 import { cliMigrate } from './migrate';
+import { cliTransform } from './transform';
 
 const commandList = [
     'build',
     'compile',
     'info',
     'migrate',
+    'transform'
 ];
 
 export function get( commandName: string ): Function {
@@ -29,6 +31,8 @@ export function get( commandName: string ): Function {
             return cliInfo;
         case 'migrate':
             return cliMigrate;
+        case 'transform':
+            return cliTransform;
         default:
             return null;
     }
