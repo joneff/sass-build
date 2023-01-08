@@ -14,9 +14,6 @@ export function validateParams( params ) {
         if (typeof file !== 'string' && !Array.isArray(file)) {
             throw new Error( '--file must be either string or array.' );
         }
-        if (file === '' || (Array.isArray( file ) && file.length === 0 ) ) {
-            throw new Error( '--file must not be empty.' );
-        }
         if (Array.isArray(file) && outFile) {
             throw new Error( 'Supply --outDir instead of --outFile.' );
         }
@@ -34,9 +31,6 @@ export function validateParams( params ) {
     if ( glob !== undefined ) {
         if (typeof glob !== 'string' && !Array.isArray(glob)) {
             throw new Error( '--glob must be either string or array.' );
-        }
-        if (glob === '' || (Array.isArray( glob ) && glob.length === 0 ) ) {
-            throw new Error( '--glob must not be empty.' );
         }
         if (outFile) {
             throw new Error( 'Supply --outDir instead of --outFile.' );

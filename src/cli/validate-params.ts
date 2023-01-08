@@ -5,11 +5,13 @@ import * as commands from './commands';
 export function validateParams( argv: argsParser.Arguments, argsParserOpts: argsParser.Options ) {
 
     const {
-        _: commandList,
+        _: _commandList,
         file, source, glob, outFile, outDir, transformer,
         config, debug, version,
         ...rest
     } = argv;
+
+    const commandList = <string[]> _commandList || [];
     const commandName = <string> commandList[0];
     const command = commands.get(commandName);
     const params = [ file, source, glob, outFile, outDir, transformer ].filter( item => item !== undefined );
@@ -69,18 +71,47 @@ export function validateParams( argv: argsParser.Arguments, argsParserOpts: args
         throw new Error( '--config parameter cannot be used with other parameters.' );
     }
 
+    // Throw error for empty file
+    if (file === '' || (Array.isArray( file ) && file.length === 0 ) ) {
+        throw new Error( '--file must not be empty.' );
+    }
+
+    // Throw error for empty source
+    if (source === '' ) {
+        throw new Error( '--source must not be empty.' );
+    }
+
+    // Throw error for empty glob
+    if (glob === '' || (Array.isArray( glob ) && glob.length === 0 ) ) {
+        throw new Error( '--glob must not be empty.' );
+    }
+
+    // Throw error for empty outFile
+    if (outFile === '' ) {
+        throw new Error( '--outFile must not be empty.' );
+    }
+
+    // Throw error for empty outDir
+    if (outDir === '' ) {
+        throw new Error( '--outDir must not be empty.' );
+    }
+
+    // Throw error for file and source
     if ( file !== undefined && source !== undefined ) {
         throw new Error( '--file and --source parameters cannot be used together.' );
     }
 
+    // Throw error for file and glob
     if ( file !== undefined && glob !== undefined ) {
         throw new Error( '--file and --glob parameters cannot be used together.' );
     }
 
+    // Throw error for source and glob
     if ( source !== undefined && glob !== undefined ) {
         throw new Error( '--source and --glob parameters cannot be used together.' );
     }
 
+    // THrow error for outFile and outDir
     if ( outFile !== undefined && outDir !== undefined ) {
         throw new Error( '--outFile and --outDir parameters cannot be used together.' );
     }
