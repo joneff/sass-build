@@ -135,112 +135,6 @@ export function getPostcss( options?: false | 'auto' | [] | PostcssProcessor ) :
 
 
 // #region sass compiler
-function getDefaultSassCompiler() : NativeSassCompiler {
-    let sassPkg = 'node-sass';
-
-    try {
-        require.resolve('node-sass');
-    } catch (ignoreError) {
-        try {
-            require.resolve('sass');
-            sassPkg = 'sass';
-        } catch (_ignoreError) {
-            try {
-                require.resolve('sass-embedded');
-                sassPkg = 'sass-embedded';
-            } catch (__ignoreError) {
-                sassPkg = 'node-sass';
-            }
-        }
-    }
-
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
-    return <NativeSassCompiler>require(sassPkg);
-}
-
-export function getSassCompiler(compiler?: string | NativeSassCompiler) : NativeSassCompiler {
-    let resolvedCompiler = <NativeSassCompiler>compiler;
-
-    if (resolvedCompiler === undefined) {
-        resolvedCompiler = getDefaultSassCompiler();
-    }
-
-    if (isString(resolvedCompiler)) {
-        resolvedCompiler = require(resolvedCompiler);
-    }
-
-    const { info } = resolvedCompiler;
-
-    if (info === undefined) {
-        throw new Error('Unknown Sass implementation.');
-    }
-
-    const infoParts = info.split('\t');
-
-    if (infoParts.length < 2) {
-        throw new Error(`Unknown Sass implementation "${info}".`);
-    }
-
-    const implementationName = infoParts[0];
-
-    switch (implementationName) {
-        case 'dart-sass':
-        case 'node-sass':
-        case 'sass-embedded': {
-            // eslint-disable-next-line consistent-return
-            return resolvedCompiler;
-        }
-        default: {
-            throw new Error(`Unknown Sass implementation "${implementationName}".`);
-        }
-    }
-}
-
-export function toLegacySassOptions(options: SassOptions) : LegacySassOptions {
-    const result = <Partial<LegacySassOptions>>{
-        // shared options
-        charset: false,
-        precision: 10,
-        indentType: 'space',
-        indentWidth: 4,
-        linefeed: 'lf',
-        sourceMap: options.sourceMap,
-        verbose: false,
-        quietDeps: true,
-
-        // legacy specific
-        file: options.file,
-        outFile: options.outFile,
-        data: options.source,
-        includePaths: options.loadPaths || [],
-        outputStyle: options.minify ? 'compressed' : 'expanded',
-        functions: options.functions,
-        importer: options.importers
-    };
-
-    return <LegacySassOptions>result;
-}
-export function toModernSassOptions(options: SassOptions) : ModernSassOptions {
-    const result = <Partial<ModernSassOptions>>{
-        // shared options
-        charset: false,
-        precision: 10,
-        indentType: 'space',
-        indentWidth: 4,
-        linefeed: 'lf',
-        sourceMap: options.sourceMap,
-        verbose: false,
-        quietDeps: true,
-
-        // modern specific
-        loadPaths: options.loadPaths || [],
-        style: options.minify ? 'compressed' : 'expanded',
-        functions: options.functions,
-        importers: options.importers
-    };
-
-    return <ModernSassOptions>result;
-}
 // #endregion
 
 
@@ -285,7 +179,7 @@ export function parsePath( filePath: string) {
     // eslint-disable-next-line no-param-reassign
     filePath = path.posix.normalize(filePath);
 
-    const pathData : Partial<PathData> = {};
+    const pathData = <PathData> {};
     const parsedPath = path.posix.parse(filePath);
 
     // for /some/path/file.js:
