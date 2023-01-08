@@ -1,3 +1,13 @@
+## [1.1.5](https://github.com/joneff/sass-build/compare/v1.1.4...v1.1.5) (2023-01-08)
+
+
+### Bug Fixes
+
+* **cli:** improve error handling and reporting ([de93f1a](https://github.com/joneff/sass-build/commit/de93f1a091f2439c1a9b3ab5abd43047189f8bb9))
+* **cli:** streamline cli based on tests ([13abdc2](https://github.com/joneff/sass-build/commit/13abdc294f9c5f5fae16865908e3a346d4a82ac4))
+* **cli:** use outDir when no outFile is passed ([ecefacf](https://github.com/joneff/sass-build/commit/ecefacf738878b097ae4f8f6b58efc53f5218fb2))
+* padCwd and trimCwd were not working correctly with absolute paths ([2d5087f](https://github.com/joneff/sass-build/commit/2d5087f313827c0c30203af91116b6094d6d2130))
+
 ## [1.1.4](https://github.com/joneff/sass-build/compare/v1.1.3...v1.1.4) (2023-01-06)
 
 
