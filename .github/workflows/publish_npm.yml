@@ -21,6 +21,12 @@ jobs:
           git reset --hard origin/master
           git merge --ff-only --quiet origin/develop
 
+      - name: Setup node
+        id: setup-node
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16.x
+
       - name: Use cache for root node_modules
         id: cache-root-node_modules
         uses: actions/cache@v3

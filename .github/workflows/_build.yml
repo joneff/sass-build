@@ -13,15 +13,20 @@ jobs:
   run:
     runs-on: ubuntu-latest
 
+    strategy:
+      matrix:
+        node-version: [16.x, 18.x]
+
     steps:
 
       - name: Checkout branch
         uses: actions/checkout@v3
 
       - name: Setup node
+        id: setup-node
         uses: actions/setup-node@v3
         with:
-          node-version: 16.x
+          node-version: ${{ matrix.node-version }}
 
       - name: Use cache for root node_modules
         id: cache-root-node_modules
