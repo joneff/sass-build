@@ -8,9 +8,9 @@ import { validateParams } from '../../src/cli/commands/info/validate-params';
 
 const INFO = `
 The following sass compilers are installed:
-- node-sass\t8.0.0
-- dart-sass\t1.56.1
-- sass-embedded\t1.56.1
+- node-sass\t9.0.0
+- dart-sass\t1.63.4
+- sass-embedded\t1.62.0
 `.trim();
 
 const PARAMS : {
