@@ -1,3 +1,11 @@
+## [1.1.6](https://github.com/joneff/sass-build/compare/v1.1.5...v1.1.6) (2023-06-14)
+
+
+### Bug Fixes
+
+* include types in distribution ([8d73420](https://github.com/joneff/sass-build/commit/8d734202d9f3daa0be69fd149e5d2f4b17e1fb98))
+* update dependencies ([2413870](https://github.com/joneff/sass-build/commit/2413870618705866e9e01ea403779a558fbc9e67))
+
 ## [1.1.5](https://github.com/joneff/sass-build/compare/v1.1.4...v1.1.5) (2023-01-08)
 
 
